@@ -8,16 +8,12 @@
 
 <body>
   <div id="main-content"></div>
+  <script src="script.js"></script>
 
   <script>
-    // Charger le contenu de main.html
-    fetch('Pages/Main.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('main-content').innerHTML = data;
-      })
-      .catch(error => console.error('Erreur de chargement :', error));
+    loadPage('main-content', 'pages/main.html');
   </script>
+
 </body>
 
 </html>
