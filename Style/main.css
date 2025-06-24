@@ -16,18 +16,23 @@ html, body {
   background-size: cover;
   background-repeat: no-repeat; 
   width: 100vw;                
-  height: 100vh;            
+  height: 100vh;   
+       
+  display: flex; 
+  justify-content: center; 
 }
 
 .overlay_box{
-  position: absolute;  
-  top: 50%;         
-  left: 50%;      
+  position: relative;
   width: 70%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.7); 
-  z-index: 10;  
-  transform: translate(-50%, -50%)      
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;   
+
+  display: flex;
+  align-items: center;  
+  justify-content:center;  
+  flex-direction: column;      
 }
 
 .title_text{
@@ -38,5 +43,25 @@ html, body {
   text-align: center;
   font-family: Logopixies;
   text-shadow: 0.25vw 0.4vw 1vw black;
-  transform: translate(-50%, -50%)  
+  transform: translate(-50%, -50%)  ;
+  z-index: 11;  
+}
+
+.card_collection_box{
+  position: relative;
+  width: 85%;
+  height: 75%;
+  margin-top: 10%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  column-gap: 1px;  
+  box-sizing: border-box;
+}
+
+.deck_box{
+  background-color: white;
+  box-shadow: 0 0 1vw black;
+  height: 30%;
+  width: 40%;
 }
