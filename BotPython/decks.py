@@ -1,27 +1,22 @@
 import discord
 from discord.ui import View, Button
+import aiomysql
 
 class Card :
   def __init__(self, name: str, image: str):
     self.name = name
     self.image = image
 
-
-imagePath = [
-  "../Assets/Decks/Default/marisa-neutral.webp",
-  "../Assets/Decks/Default/reimu-neutral.webp",
-  "../Assets/Decks/Default/kirin-neutral.webp",
-]
-
 defaultDeck = []
 
-def initDeck():
+async def initDeck(conn, deck_id):
     defaultDeck.clear()
-    defaultDeck.extend([
-        Card("Marisa Kirisame", imagePath[0]),
-        Card("Reimu Hakurei", imagePath[1]),
-        Card("Satsuki Rin", imagePath[2]),
-    ])
+    async with conn.cursor() as cur:
+        # Récupérer les cartes du deck donné
+        await cur.execute("SELECT name, image_url FROM card WHERE deck_id=%s", (deck_id,))
+        rows = await cur.fetchall()
+        for name, image_url in rows:
+            defaultDeck.append(Card(name, image_url))
 
 class DeckView(View):
     def __init__(self, deck):

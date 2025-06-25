@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord import app_commands,Embed
 from dotenv import load_dotenv
 import decks
+from Data import database
 
 load_dotenv()
 
@@ -15,8 +16,8 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
-    decks.initDeck()  
-
+    conn = await database.get_connection()
+    await decks.initDeck(conn, 1)
     await bot.tree.sync(guild=None) 
     print("Slash commands synchronisées.")
 
