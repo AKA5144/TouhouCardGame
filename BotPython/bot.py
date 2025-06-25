@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands,Embed
 from dotenv import load_dotenv
+import decks
 
 load_dotenv()
 
@@ -14,9 +15,9 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
-    
-    # Supprimer les slash commands pour le GUILD ID donné, ou None pour global
-    await bot.tree.sync(guild=None)  # tu peux mettre un Guild ici si tu veux tester localement
+    decks.initDeck()  
+
+    await bot.tree.sync(guild=None) 
     print("Slash commands synchronisées.")
 
 @bot.event
@@ -33,6 +34,9 @@ async def website(interaction: discord.Interaction):
     embed = Embed(title="Online Website !", url="https://aka5144.github.io/TouhouCardGame")
     await interaction.response.send_message(embed=embed)
 
+@bot.tree.command(name="showdeck", description="Display the Deck")
+async def showdeck(interaction: discord.Interaction):
+    await decks.send_deck(interaction)
 
 if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
