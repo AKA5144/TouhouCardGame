@@ -12,7 +12,6 @@ defaultDeck = []
 async def initDeck(conn, deck_id):
     defaultDeck.clear()
     async with conn.cursor() as cur:
-        # Récupérer les cartes du deck donné
         await cur.execute("SELECT name, image_url FROM card WHERE deck_id=%s", (deck_id,))
         rows = await cur.fetchall()
         for name, image_url in rows:

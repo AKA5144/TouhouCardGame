@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="Style/main.css">
+  <title>Touhou Card Game</title>
+</head>
+<body>
+  <div class="background">
+    <div class="overlay_box">
+      <p class="title_text">TOUHOU CARD GAME</p> 
+        <div class="card_collection_box" id="deck-collection"></div>
+          <script type="module">
+            import { loadDecks } from './database.js';
+            loadDecks();
+          </script>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
