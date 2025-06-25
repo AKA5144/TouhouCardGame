@@ -1,6 +1,5 @@
 import discord
 from discord.ui import View, Button
-import aiomysql
 
 class Card :
   def __init__(self, name: str, image: str):
