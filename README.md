@@ -1,7 +1,8 @@
 requirements : 
 python 3.11
 Discord
-
+wamp : https://www.wampserver.com
+sql : https://dev.mysql.com/downloads/installer/
 
 package:
 pip install discord.py 
