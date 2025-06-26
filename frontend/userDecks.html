@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="Style/userDecks.css">
+  <title>Touhou Card Game- Deck</title>
+</head>
+<body>
+    <div class="overlay_box">
+<p id="welcome">Bienvenue, invité</p>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const username = params.get('username');
+  if(username) {
+    document.getElementById('welcome').textContent = `Bienvenue, ${username} !`;
+  }
+</script>
+       <a id="discord-login-btn" href="#" class="discord-btn">Se connecter avec Discord</a>
+         <script>
+
+    const clientId = '1386612121181093939';
+    const redirectUri = 'http://localhost:3000/oauth-callback'; 
+    const scope = 'identify';
+    const responseType = 'code';
+
+    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${scope}`;
+
+    document.getElementById('discord-login-btn').href = discordAuthUrl;
+
+  </script>
+        <div class="card_collection_box" id="card-collection">
+        </div>
+
+  </div>
+</body>
+</html>
