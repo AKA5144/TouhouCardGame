@@ -34,6 +34,16 @@ app.get('/deck-names', (req, res) => {
   });
 });
 
+app.get('/cards', (req, res) => {
+  db.query('SELECT name, image_url FROM card', (err, results) => {
+    if (err) {
+      console.error('Erreur en récupérant les cartes :', err);
+      return res.status(500).send('Erreur serveur');
+    }
+    res.json(results); 
+  });
+});
+
 app.listen(port, () => {
   console.log(`Serveur Node.js lancé sur http://localhost:${port}`);
 });
