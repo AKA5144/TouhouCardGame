@@ -7,7 +7,7 @@ sql : https://dev.mysql.com/downloads/installer/
 package:
 pip install discord.py 
 pip install python-dotenv
-
+npm install axios
 
 configure a .env and place 
 your discord token
