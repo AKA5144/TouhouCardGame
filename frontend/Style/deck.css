@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Logopixies';
-  src: url('../../Assets/Font/Logopixies-owwBB.ttf') format('truetype');
+  src: url('../Assets/Font/Logopixies-owwBB.ttf') format('truetype');
 }
 
 html, body {
@@ -8,31 +8,30 @@ html, body {
   padding: 0;
 }
 
-.background{
-  position: relative;
-  background-image: url('../../Assets/Main/Background.png');     
-  background-position: center; 
-  background-size: cover;
-  background-repeat: no-repeat; 
-  width: 100vw;                
-  height: 100vh;   
-       
+body {
+  background-image: url('../../Assets/Main/Background.png');
+  background-repeat: no-repeat;
+  background-size: cover;   
+  background-position: center center;
+  background-attachment: fixed;     
+
   display: flex; 
   justify-content: center; 
 }
 
+
 .overlay_box{
   position: relative;
   width: 70%;
-  height: 100%;
   background-color: rgba(255, 255, 255, 0.7);
   z-index: 10;   
-
   display: flex;
   align-items: center;  
   justify-content:center;  
   flex-direction: column;      
+
 }
+
 
 .title_text{
   position: absolute;  
@@ -49,7 +48,6 @@ html, body {
  .card_collection_box {
       position: relative;
       width: 85%;
-      height: 75%;
       margin-top: 10%;
       background-color: rgba(0, 0, 0, 0.5);
       display: grid;
@@ -57,9 +55,9 @@ html, body {
       grid-gap: 20px;
       padding-top: 20px;
       justify-items: center;
-    }
+}
 
-    .deck_box {
+ .card_box {
       width: 200px;
       height: 300px;
       background-color: rgba(0, 0, 0, 0.329);
@@ -80,7 +78,7 @@ html, body {
       user-select: none;
     }
 
-    .deck_box:hover {
+    .card_box:hover {
       box-shadow: 0.20vw 0.4vw 1vw white;
       width: 210px;
       height: 310px;

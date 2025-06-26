@@ -2,14 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="Style/main.css">
+  <link rel="stylesheet" href="Style/deck.css">
   <title>Touhou Card Game- Deck</title>
 </head>
 <body>
-  <div class="background">
     <div class="overlay_box">
-      <p class="title_text">TOUHOU CARD GAME</p> 
-      </div>
-    </div>
+      <p class="title_text">BASE DECK COLLECTION</p> 
+        <div class="card_collection_box" id="card-collection">
+          <script type="module">
+            import { loadCards } from './database.js';
+            loadCards();
+          </script> 
+        </div>
+
+  </div>
 </body>
 </html>
