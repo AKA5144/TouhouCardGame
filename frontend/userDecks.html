@@ -7,31 +7,22 @@
 </head>
 <body>
     <div class="overlay_box">
-<p id="welcome">Bienvenue, invité</p>
-
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const username = params.get('username');
-  if(username) {
-    document.getElementById('welcome').textContent = `Bienvenue, ${username} !`;
-  }
-</script>
+      <p id="welcome">Bienvenue, invité</p>
+        <script type="module">
+          import { setWelcomeMessage } from './Script/userDecks.js';
+          setWelcomeMessage('welcome');
+        </script>
        <a id="discord-login-btn" href="#" class="discord-btn">Se connecter avec Discord</a>
-         <script>
-
-    const clientId = '1386612121181093939';
-    const redirectUri = 'http://localhost:3000/oauth-callback'; 
-    const scope = 'identify';
-    const responseType = 'code';
-
-    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${scope}`;
-
-    document.getElementById('discord-login-btn').href = discordAuthUrl;
-
-  </script>
-        <div class="card_collection_box" id="card-collection">
+        <script type="module">
+          import { discordButton } from './Script/userDecks.js';
+          discordButton();
+        </script>
+         <div class="card_collection_box" id="card-collection">
+          <script type="module">
+            import { fetchUserInfo } from './Script/userDecks.js';
+             fetchUserInfo();
+          </script>
         </div>
-
   </div>
 </body>
 </html>
