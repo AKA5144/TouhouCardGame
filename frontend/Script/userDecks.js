@@ -49,7 +49,11 @@ export async function fetchUserInfo() {
     const data = await response.json();
     console.log("Données utilisateur reçues:", data);
 
-    document.getElementById('welcome').textContent = `Bienvenue, ${data.username}#${data.discriminator} !`;
+    const welcomeText = data.discriminator === '0' 
+  ? `Bienvenue, ${data.username} !` 
+  : `Bienvenue, ${data.username}#${data.discriminator} !`;
+
+document.getElementById('welcome').textContent = welcomeText;
 
   } catch (err) {
     console.error('Erreur récupération user info', err);
