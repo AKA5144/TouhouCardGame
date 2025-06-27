@@ -3,7 +3,7 @@ require('dotenv').config({ path: '../BotPython/Data/.env' });
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const axios = require('axios');
+const axios = require('axios');//better pacakge 
 
 
 const app = express();
@@ -11,16 +11,12 @@ const port = 3000;
 
 app.use(cors()); 
 
-const clientId = '1386612121181093939';
-const clientSecret = 'j2QBfPWwPmCSDAqWgrTtyLLEUAPZysmb';
-const redirectUri = 'http://localhost:3000/oauth-callback';
-
 
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: 'Touhou_decks'
+  database: process.env.DB_NAME
 });
 
 db.connect(err => {
@@ -58,11 +54,11 @@ app.get('/oauth-callback', async (req, res) => {
 
   try {
     const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
+      client_id: process.env.CLIENTID,
+      client_secret: process.env.CLIENTSECRET,
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: redirectUri,
+      redirect_uri: process.env.DISCORD_REDIRECT_URL,
     }), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -79,10 +75,8 @@ app.get('/oauth-callback', async (req, res) => {
 
     const userData = userResponse.data;
 
-    const username = userData.discriminator !== '0'
-  ? `${userData.username}#${userData.discriminator}`
-  : userData.username;
-     res.redirect(`http://127.0.0.1:5500/frontend/userDecks.html?username=${encodeURIComponent(username)}`);
+    const username = userData.discriminator !== '0'? `${userData.username}#${userData.discriminator}`: userData.username;
+     res.redirect(`${process.env.USER_REDIRECT_URL}?username=${encodeURIComponent(username)}`);
 } catch (error) {
   console.error('Erreur Discord:', error.response?.data || error.message);
   res.status(500).send('Erreur lors de l’authentification Discord');
