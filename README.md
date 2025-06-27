@@ -8,6 +8,7 @@ package:
 pip install discord.py 
 pip install python-dotenv
 npm install axios
+npm install jsonwebtoken
 
 configure a .env and place 
 your discord token
