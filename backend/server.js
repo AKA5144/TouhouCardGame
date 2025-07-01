@@ -11,7 +11,22 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const port = 3000;
 
+
 const allowedOrigins = ['http://localhost:5500', 'http://127.0.0.1:5500'];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin); // dynamique
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  }
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204); // preflight
+  }
+  next();
+});
 
 app.use(cors({
   origin: function(origin, callback){
@@ -26,7 +41,9 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
+const path = require('path');
 
+app.use(express.static(path.join(__dirname, 'frontend')));
 
 
 const db = mysql.createConnection({
@@ -37,14 +54,13 @@ const db = mysql.createConnection({
 });
 
 function authenticateToken(req, res, next) {
-  // On récupère le token dans les cookies
   const token = req.cookies.token;
 
   if (!token) return res.status(401).json({ error: 'Token manquant' });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ error: 'Token invalide ou expiré' });
-    req.user = user; // données décodées du token (id, username, ...)
+    req.user = user; 
     next();
   });
 }
@@ -81,16 +97,16 @@ app.get('/user-info', authenticateToken, (req, res) => {
   res.json({
     username: req.user.username,
     id: req.user.id,
-    discriminator: req.user.discriminator
+    discriminator: req.user.discriminator,
+    avatar: req.user.avatar  
   });
 });
-
 
 
 app.get('/oauth-callback', async (req, res) => {
   console.log('Route /oauth-callback appelée'); // Log pour vérifier l'appel
 
-  const code = req.query.code;
+  const { code, state } = req.query;
   if (!code) {
     console.log('Pas de code dans la requête');
     return res.status(400).send('No code provided');
@@ -121,12 +137,15 @@ app.get('/oauth-callback', async (req, res) => {
 
     const userData = userResponse.data;
 
-    // Génération du token JWT
     const jwtToken = jwt.sign(
-      { id: userData.id, username: userData.username, discriminator: userData.discriminator },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+      { 
+        id: userData.id, 
+        username: userData.username, 
+        discriminator: userData.discriminator,
+        avatar: userData.avatar //
+      },
+    process.env.JWT_SECRET,
+);
 
     console.log('JWT token créé:', jwtToken);
 
@@ -135,11 +154,17 @@ app.get('/oauth-callback', async (req, res) => {
       httpOnly: true,
       secure: false, // à passer à true en prod avec HTTPS
       sameSite: 'Lax',
-      maxAge: 3600000, // 1 heure
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 semaine en millisecondes
     });
 
     // Redirection vers la page frontend (sans exposer le token ni username en URL)
-    res.redirect('http://localhost:5500/frontend/userDecks.html');
+      if(state) {
+    const redirectUrl = decodeURIComponent(state);
+    return res.redirect(redirectUrl);
+  }
+
+  // Sinon rediriger par défaut vers la home
+  res.redirect('/');
   } catch (error) {
     console.error('Erreur Discord:', error.response?.data || error.message);
     res.status(500).send('Erreur lors de l’authentification Discord');
