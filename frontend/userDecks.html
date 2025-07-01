@@ -7,16 +7,12 @@
 </head>
 <body>
     <div class="overlay_box">
-      <p id="welcome">Bienvenue, invité</p>
-        <script type="module">
-          import { setWelcomeMessage } from './Script/userDecks.js';
-          setWelcomeMessage('welcome');
-        </script>
-       <a id="discord-login-btn" href="#" class="discord-btn">Se connecter avec Discord</a>
-        <script type="module">
-          import { discordButton } from './Script/userDecks.js';
-          discordButton();
-        </script>
+      <div id="discord-login-container"></div>
+
+      <script type="module">
+         import { renderDiscordLogin } from './Script/userDecks.js';
+         renderDiscordLogin('discord-login-container');
+      </script>
          <div class="card_collection_box" id="card-collection">
           <script type="module">
             import { fetchUserInfo } from './Script/userDecks.js';
