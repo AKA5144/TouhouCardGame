@@ -2,28 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="Style/deck.css">
-   <link rel="stylesheet" href="Style/userDecks.css">
-  <title>Touhou Card Game- Deck</title>
+  <link rel="stylesheet" href="Style/deck.css" />
+  <link rel="stylesheet" href="Style/userDecks.css" />
+  <link rel="stylesheet" href="Style/button.css" />
+  <title>Touhou Card Game - Deck</title>
 </head>
 <body>
-    <div class="overlay_box">
-      <div id="discord-login-container"></div>
-          <script type="module">
-          import { renderDiscordLogin } from './Script/userDecks.js';
-          renderDiscordLogin('discord-login-container');
-          </script>
-          <p class="title_text">BASE DECK COLLECTION</p> 
-            <div class="card_collection_box" id="card-collection">
-                <script type="module">
-                 import { loadCards } from './Script/database.js';
-                loadCards();
-                 </script> 
-                           <script type="module">
-            import { fetchUserInfo } from './Script/userDecks.js';
-             fetchUserInfo();
-          </script>
-              </div>
-      </div>
+  <div class="overlay_box">
+
+    <div id="discord-login-container"></div>
+
+    <p class="title_text">BASE DECK COLLECTION</p>
+    <div class="switch-container">
+  <label class="switch">
+    <input type="checkbox" />
+    <span class="slider"></span>
+  </label>
+  <span class="switch-text">see non possessed card</span>
+</div>
+    <div class="card_collection_box" id="card-collection"></div>
+
+    </div>
+    
+  </div>
+
+  <script type="module">
+    import { renderDiscordLogin } from './Script/userDecks.js';
+    renderDiscordLogin('discord-login-container');
+  </script>
+
+  <script type="module">
+    import { loadCards } from './Script/database.js';
+    loadCards();
+  </script> 
+
+  <script type="module">
+    import { fetchUserInfo } from './Script/userDecks.js';
+    fetchUserInfo();
+  </script>
+
 </body>
 </html>
