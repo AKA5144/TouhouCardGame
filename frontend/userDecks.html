@@ -2,23 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="Style/userDecks.css">
-  <title>Touhou Card Game- Deck</title>
+  <link rel="stylesheet" href="Style/main.css" />
+  <link rel="stylesheet" href="Style/userDecks.css" />
+  <link rel="stylesheet" href="Style/button.css" />
+  <title>Touhou Card Game</title>
 </head>
 <body>
-    <div class="overlay_box">
+  <div class="overlay_box">
       <div id="discord-login-container"></div>
 
-      <script type="module">
-         import { renderDiscordLogin } from './Script/userDecks.js';
-         renderDiscordLogin('discord-login-container');
-      </script>
-         <div class="card_collection_box" id="card-collection">
-          <script type="module">
-            import { fetchUserInfo } from './Script/userDecks.js';
-             fetchUserInfo();
-          </script>
-        </div>
+      <p class="title_text">TOUHOU CARD GAME</p> 
+
+      <div class="card_collection_box" id="deck-collection"></div>
+
+    </div>
   </div>
+
+
+  <script type="module">
+    import { renderDiscordLogin } from './Script/userDecks.js';
+    renderDiscordLogin('discord-login-container');
+  </script>
+
+  <script type="module">
+    import { loadDecks } from './Script/database.js';
+    loadDecks();
+  </script>
+
+  <script type="module">
+    import { fetchUserInfo } from './Script/userDecks.js';
+    fetchUserInfo();
+  </script>
+
 </body>
 </html>

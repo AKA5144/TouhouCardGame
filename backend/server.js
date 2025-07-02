@@ -84,7 +84,7 @@ app.get('/deck-names', (req, res) => {
 });
 
 app.get('/cards', (req, res) => {
-  db.query('SELECT name, image_url FROM card', (err, results) => {
+  db.query('SELECT id, name, image_url, deck_id  FROM card', (err, results) => {
     if (err) {
       console.error('Erreur en récupérant les cartes :', err);
       return res.status(500).send('Erreur serveur');
@@ -102,6 +102,35 @@ app.get('/user-info', authenticateToken, (req, res) => {
   });
 });
 
+app.get('/user-cards', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  const query = `
+    SELECT card_id 
+    FROM user_cards 
+    WHERE discord_id = ?
+  `;
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des cartes du joueur :', err);
+      return res.status(500).send('Erreur serveur');
+    }
+
+    const cardIds = results.map(row => row.card_id);
+    res.json({ ownedCards: cardIds });
+  });
+});
+
+app.post('/logout', (req, res) => {
+  // Effacer le cookie JWT côté client
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false, // true en prod avec HTTPS
+    sameSite: 'Lax',
+  });
+  res.status(200).send({ message: 'Déconnecté' });
+});
 
 app.get('/oauth-callback', async (req, res) => {
   console.log('Route /oauth-callback appelée'); // Log pour vérifier l'appel
@@ -137,6 +166,26 @@ app.get('/oauth-callback', async (req, res) => {
 
     const userData = userResponse.data;
 
+    const insertQuery = `
+      INSERT INTO users (discord_id, username, discriminator, avatar, last_login)
+      VALUES (?, ?, ?, ?, NOW())
+      ON DUPLICATE KEY UPDATE
+      username = VALUES(username),
+      discriminator = VALUES(discriminator),
+      avatar = VALUES(avatar),
+      last_login = NOW()
+    `;
+
+    db.query(
+  insertQuery,
+  [userData.id, userData.username, userData.discriminator, userData.avatar],
+  (err) => {
+    if (err) {
+      console.error('Erreur insertion utilisateur en BDD:', err);
+    }
+  }
+);
+
     const jwtToken = jwt.sign(
       { 
         id: userData.id, 
@@ -170,7 +219,6 @@ app.get('/oauth-callback', async (req, res) => {
     res.status(500).send('Erreur lors de l’authentification Discord');
   }
 });
-
 
 app.listen(port, () => {
   console.log(`Serveur Node.js lancé sur http://localhost:${port}`);
