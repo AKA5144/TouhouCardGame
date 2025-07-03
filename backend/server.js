@@ -97,6 +97,19 @@ app.get('/cards', (req, res) => {
   });
 });
 
+app.get('/default-card', (req, res) => {
+  db.query('SELECT image_url FROM card WHERE id = 0', (err, results) => {
+    if (err) {
+      console.error('Erreur récupération de la carte par défaut :', err);
+      return res.status(500).send('Erreur serveur');
+    }
+    if (results.length === 0) {
+      return res.status(404).send('Carte non trouvée');
+    }
+    res.json({ image_url: results[0].image_url });
+  });
+});
+
 app.get('/user-info', authenticateToken, (req, res) => {
   res.json({
     username: req.user.username,
