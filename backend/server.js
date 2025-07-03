@@ -12,7 +12,11 @@ const app = express();
 const port = 3000;
 
 
-const allowedOrigins = ['http://localhost:5500', 'http://127.0.0.1:5500'];
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'https://aka5144.github.io'
+];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
