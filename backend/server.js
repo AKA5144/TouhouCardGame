@@ -74,7 +74,7 @@ db.connect(err => {
 });
 
 app.get('/deck-names', (req, res) => {
-  db.query('SELECT name, image_url, image_hover_url, link FROM deck', (err, results) => {
+  db.query('SELECT ID, name, image_url, image_hover_url, link FROM deck', (err, results) => {
     if (err) {
       console.error('Erreur en récupérant les noms des decks :', err);
       return res.status(500).send('Erreur serveur');

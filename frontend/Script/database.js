@@ -26,9 +26,8 @@ export function loadDecks(containerId = 'deck-collection') {
         });
 
         div.addEventListener('click', () => {
-          if (deck.link) {
-            window.location.href = deck.link;
-          }
+          const deckId = encodeURIComponent(deck.ID);
+          window.location.href = `deck.html?deckId=${deckId}`;
         });
 
         container.appendChild(div);
@@ -47,6 +46,12 @@ export async function loadCards(containerId = 'card-collection') {
   container.innerHTML = '';
   const defaultImage = '../Assets/Decks/Default/default.webp';
 
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+  const selectedDeckId = getQueryParam('deckId');
+
   try {
     const [cardsRes, userRes] = await Promise.all([
       fetch('http://localhost:3000/cards'),
@@ -56,28 +61,36 @@ export async function loadCards(containerId = 'card-collection') {
 
     const owned = userRes.ok ? (await userRes.json()).ownedCards : [];
 
+    // Conversion en string pour éviter mismatch types (string vs number)
+    const filteredCards = selectedDeckId
+      ? cards.filter(card => String(card.deck_id) === String(selectedDeckId))
+      : cards;
+
+    console.log('selectedDeckId:', selectedDeckId);
+    console.log('filteredCards:', filteredCards);
+
     const switchInput = document.querySelector('.switch input');
     const showRealImages = switchInput?.checked ?? false;
 
-function updateDisplay(showReal) {
-  container.innerHTML = '';
-  cards.forEach(card => {
-    const div = document.createElement('div');
-    div.classList.add('card_box');
+    function updateDisplay(showReal) {
+      container.innerHTML = '';
+      filteredCards.forEach(card => {
+        const div = document.createElement('div');
+        div.classList.add('card_box');
 
-    const isOwned = owned.includes(card.id);
-    const imageUrl = showReal || isOwned ? card.image_url : defaultImage;
-    div.style.backgroundImage = `url('${imageUrl}')`;
+        const isOwned = owned.includes(card.id);
+        const imageUrl = showReal || isOwned ? card.image_url : defaultImage;
+        div.style.backgroundImage = `url('${imageUrl}')`;
 
-    if (showReal || isOwned) {
-      div.textContent = card.name;
-    } else {
-      div.textContent = '';
+        if (showReal || isOwned) {
+          div.textContent = card.name;
+        } else {
+          div.textContent = '';
+        }
+
+        container.appendChild(div);
+      });
     }
-
-    container.appendChild(div);
-  });
-}
 
     updateDisplay(showRealImages);
 
@@ -90,3 +103,5 @@ function updateDisplay(showReal) {
     console.error('Erreur lors du chargement des cartes ou de la possession :', err);
   }
 }
+
+
