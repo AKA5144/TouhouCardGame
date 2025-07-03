@@ -44,7 +44,6 @@ export async function loadCards(containerId = 'card-collection') {
   if (!container) return;
 
   container.innerHTML = '';
-  app.get('/default-card', (req, res) => {
   let defaultImage = '';
 
   try {
