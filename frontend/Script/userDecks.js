@@ -26,7 +26,6 @@ export function getQueryParams() {
 export function setWelcomeMessage(elementId, usernameParam = 'username') {
   const params = getQueryParams();
   const username = params[usernameParam];
-  console.log(username);
   if (username) {
     const el = document.getElementById(elementId);
     if (el) el.textContent = `Bienvenue, ${username} !`;
