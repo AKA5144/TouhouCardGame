@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="Style/main.css" />
-  <link rel="stylesheet" href="Style/userDecks.css" />
-  <link rel="stylesheet" href="Style/button.css" />
+  <link rel="stylesheet" href="frontend/Style/main.css" />
+  <link rel="stylesheet" href="frontend/Style/userDecks.css" />
+  <link rel="stylesheet" href="frontend/Style/button.css" />
   <title>Touhou Card Game</title>
 </head>
 <body>
@@ -20,17 +20,17 @@
 
 
   <script type="module">
-    import { renderDiscordLogin } from './Script/userDecks.js';
+    import { renderDiscordLogin } from './frontend/Script/userDecks.js';
     renderDiscordLogin('discord-login-container');
   </script>
 
   <script type="module">
-    import { loadDecks } from './Script/database.js';
+    import { loadDecks } from './frontend/Script/database.js';
     loadDecks();
   </script>
 
   <script type="module">
-    import { fetchUserInfo } from './Script/userDecks.js';
+    import { fetchUserInfo } from './frontend/Script/userDecks.js';
     fetchUserInfo();
   </script>
 
