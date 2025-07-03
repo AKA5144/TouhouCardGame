@@ -9,6 +9,7 @@ pip install discord.py
 pip install python-dotenv
 npm install axios
 npm install jsonwebtoken
+pip install aiomysql
 
 configure a .env and place 
 your discord token
