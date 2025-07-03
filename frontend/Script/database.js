@@ -75,8 +75,6 @@ export async function loadCards(containerId = 'card-collection') {
       ? cards.filter(card => String(card.deck_id) === String(selectedDeckId))
       : cards;
 
-    console.log('selectedDeckId:', selectedDeckId);
-    console.log('filteredCards:', filteredCards);
 
     const switchInput = document.querySelector('.switch input');
     const showRealImages = switchInput?.checked ?? false;
