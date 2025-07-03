@@ -32,6 +32,11 @@ body {
 
 }
 
+.title_deck{
+ position: absolute;
+ top: 9%; 
+ right: 85%
+}
 
 .title_text{
   position: absolute;  

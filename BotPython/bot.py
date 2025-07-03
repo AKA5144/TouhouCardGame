@@ -5,6 +5,7 @@ from discord import app_commands,Embed
 from dotenv import load_dotenv
 import decks
 from Data import database
+from spawnCard import register_spawn
 
 load_dotenv()
 
@@ -16,9 +17,14 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
-    conn = await database.get_connection()
-    await decks.initDeck(conn, 1)
-    await bot.tree.sync(guild=None) 
+    pool = await database.get_connection()
+
+    async with pool.acquire() as conn:
+        await decks.initDeck(conn, 1)
+
+    register_spawn(bot.tree)
+
+    await bot.tree.sync(guild=None)
     print("Slash commands synchronisées.")
 
 @bot.event
@@ -38,6 +44,7 @@ async def website(interaction: discord.Interaction):
 @bot.tree.command(name="showdeck", description="Display the Deck")
 async def showdeck(interaction: discord.Interaction):
     await decks.send_deck(interaction)
+
 
 if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
