@@ -10,7 +10,7 @@ html, body {
 
 .background{
   position: relative;
-  background-image: url('../../Assets/Main/Background.png');     
+  background-image: url('../Assets/Main/Background.png');   
   background-position: center; 
   background-size: cover;
   background-repeat: no-repeat; 
