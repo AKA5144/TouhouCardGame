@@ -44,7 +44,17 @@ export async function loadCards(containerId = 'card-collection') {
   if (!container) return;
 
   container.innerHTML = '';
-  const defaultImage = '../Assets/Decks/Default/default.webp';
+  app.get('/default-card', (req, res) => {
+  let defaultImage = '';
+
+  try {
+    const res = await fetch('http://localhost:3000/default-card');
+    const data = await res.json();
+    defaultImage = data.image_url;
+  } catch (error) {
+    console.error('Erreur lors du chargement de l’image par défaut :', error);
+    defaultImage = 'Assets/Decks/Default/default.webp'; // fallback
+  }
 
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
