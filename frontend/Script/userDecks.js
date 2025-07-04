@@ -1,6 +1,6 @@
 export function discordButton(){
   const clientId = '1386612121181093939';
-  const redirectUri = 'http://localhost:3000/oauth-callback'; 
+  const redirectUri = 'https://touhou-backend.onrender.com/oauth-callback'; 
   const scope = 'identify';
   const responseType = 'code';
 
@@ -34,7 +34,7 @@ export function setWelcomeMessage(elementId, usernameParam = 'username') {
 
 export async function getUserInfo() {
   try {
-    const response = await fetch('http://localhost:3000/user-info', {
+    const response = await fetch('https://touhou-backend.onrender.com/user-info', {
       credentials: 'include',
     });
 

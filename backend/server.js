@@ -10,29 +10,18 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// 🔐 Autoriser plusieurs origines dynamiquement depuis .env
+const cors = require('cors');
+
 const allowedOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map(origin => origin.trim());
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  }
-  if (req.method === 'OPTIONS') return res.sendStatus(204);
-  next();
-});
 
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    callback(new Error('CORS origin interdit'));
+    return callback(new Error('CORS origin interdit'));
   },
   credentials: true
 }));
@@ -130,9 +119,9 @@ app.get('/user-cards', authenticateToken, (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'Lax',
+    secure: true, 
+    sameSite: 'None', 
+    httpOnly: true
   });
   res.status(200).send({ message: 'Déconnecté' });
 });
