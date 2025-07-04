@@ -1,5 +1,5 @@
 export function loadDecks(containerId = 'deck-collection') {
-  fetch('http://localhost:3000/deck-names')//requete vers le domaine créer par get app en backend
+  fetch('https://touhou-backend.onrender.com/deck-names')//requete vers le domaine créer par get app en backend
     .then(response => response.json())
     .then(data => {
       const container = document.getElementById(containerId);
@@ -47,7 +47,7 @@ export async function loadCards(containerId = 'card-collection') {
   let defaultImage = '';
 
   try {
-    const res = await fetch('http://localhost:3000/default-card');
+    const res = await fetch('https://touhou-backend.onrender.com/default-card');
     const data = await res.json();
     defaultImage = data.image_url;
   } catch (error) {
@@ -63,8 +63,8 @@ export async function loadCards(containerId = 'card-collection') {
 
   try {
     const [cardsRes, userRes] = await Promise.all([
-      fetch('http://localhost:3000/cards'),
-      fetch('http://localhost:3000/user-cards', { credentials: 'include' }),
+      fetch('https://touhou-backend.onrender.com/cards'),
+      fetch('https://touhou-backend.onrender.com/user-cards', { credentials: 'include' }),
     ]);
     const cards = await cardsRes.json();
 
