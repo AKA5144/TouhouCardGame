@@ -112,8 +112,8 @@ export function updateUserUI(userData, loginBtnId = 'discord-login-btn') {
       logoutBtn.addEventListener('click', () => {
         fetch('https://touhou-backend.onrender.com/logout', {
           method: 'POST',
-          credentials: 'include'
-          })
+          credentials: 'include',
+        })
         .then(() => window.location.reload())
         .catch(err => console.error('Erreur logout:', err));
       });
