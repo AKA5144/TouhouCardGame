@@ -60,7 +60,18 @@ async def spawn_command(interaction: discord.Interaction):
             if card_row is None:
                 await interaction.followup.send(f"❌ Aucune carte trouvée dans le deck `{deck_name}`.")
                 return
-            card_id, card_name, image_path = card_row
+            card_id, card_name, image_path_relative = card_row
+
+    # Adaptation du chemin local selon format BDD
+    if not image_path_relative.startswith("../"):
+        # Ajout de ../ pour que le chemin pointe vers le dossier parent localement
+        image_path_relative = os.path.join("..", image_path_relative)
+
+    # Normalisation du chemin pour la plateforme (Windows/Linux)
+    image_path_relative = os.path.normpath(image_path_relative)
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.join(BASE_DIR, image_path_relative)
 
     if not os.path.isfile(image_path):
         await interaction.followup.send(f"❌ Image locale introuvable : `{image_path}`")

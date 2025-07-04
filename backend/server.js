@@ -120,9 +120,11 @@ app.get('/user-cards', authenticateToken, (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('token', {
-    secure: true, 
-    sameSite: 'None', 
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'None',
+    secure: true,
+    path: '/',
+    // domain: 'example.com', // idem si défini à la création
   });
   res.status(200).send({ message: 'Déconnecté' });
 });
