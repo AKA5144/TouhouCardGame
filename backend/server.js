@@ -10,17 +10,18 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const cors = require('cors');
-
 const allowedOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map(origin => origin.trim());
+console.log('🔵 Origines autorisées :', allowedOrigins);
 
 app.use(cors({
   origin: function (origin, callback) {
+    console.log('🌐 Requête CORS venant de :', origin);
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
+   console.log('⛔ CORS REFUSÉ :', origin);
     return callback(new Error('CORS origin interdit'));
   },
   credentials: true
@@ -177,8 +178,8 @@ app.get('/oauth-callback', async (req, res) => {
 
     res.cookie('token', jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Lax',
+      sameSite: 'None',
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 semaine
     });
 
