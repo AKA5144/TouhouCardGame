@@ -50,7 +50,6 @@ export async function loadCards(containerId = 'card-collection') {
     const res = await fetch('http://localhost:3000/default-card');
     const data = await res.json();
     defaultImage = data.image_url;
-    console.log('defaultImage:', defaultImage);
   } catch (error) {
     console.error('Erreur lors du chargement de l’image par défaut :', error);
     defaultImage = 'Assets/Decks/Default/default.webp'; 
