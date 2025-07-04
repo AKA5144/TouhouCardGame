@@ -40,7 +40,7 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT, // Utiliser le port 44067 de votre capture
+
   connectTimeout: 30000, // 30 secondes
   ssl: { rejectUnauthorized: false } // SSL requis par Railway
 });

@@ -7,13 +7,13 @@ from Data.user_utils import ensure_user_registered
 
 class AcquireCardView(View):
     def __init__(self, user_id: int, card_id: int):
-        super().__init__(timeout=60)  # bouton actif 60 sec max
+        super().__init__(timeout=60)  
         self.user_id = user_id
         self.card_id = card_id
 
     @discord.ui.button(label="Get", style=discord.ButtonStyle.green)
     async def acquire_button(self, interaction: discord.Interaction, button: Button):
-        # Vérifie que c'est bien le même utilisateur
+        
         if interaction.user.id != self.user_id:
             await interaction.response.send_message("❌ do not steal !!!!!!!!!!!!!!", ephemeral=True)
             return
@@ -43,7 +43,7 @@ async def spawn_command(interaction: discord.Interaction):
 
     async with pool.acquire() as conn:
         async with conn.cursor() as cursor:
-            # Tirage aléatoire d'un deck
+            
             await cursor.execute("SELECT ID, name FROM deck ORDER BY RAND() LIMIT 1")
             deck_row = await cursor.fetchone()
             if deck_row is None:
@@ -51,7 +51,7 @@ async def spawn_command(interaction: discord.Interaction):
                 return
             deck_id, deck_name = deck_row
 
-            # Tirage aléatoire d'une carte dans ce deck
+            
             await cursor.execute(
                 "SELECT id, name, image_url FROM card WHERE deck_id = %s ORDER BY RAND() LIMIT 1",
                 (deck_id,)
@@ -62,12 +62,11 @@ async def spawn_command(interaction: discord.Interaction):
                 return
             card_id, card_name, image_path_relative = card_row
 
-    # Adaptation du chemin local selon format BDD
+    
     if not image_path_relative.startswith("../"):
-        # Ajout de ../ pour que le chemin pointe vers le dossier parent localement
+        
         image_path_relative = os.path.join("..", image_path_relative)
 
-    # Normalisation du chemin pour la plateforme (Windows/Linux)
     image_path_relative = os.path.normpath(image_path_relative)
 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
