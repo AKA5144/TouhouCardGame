@@ -195,4 +195,20 @@ app.get('/oauth-callback', async (req, res) => {
 
 app.listen(port, () => {
   console.log(`🚀 Serveur lancé sur http://localhost:${port}`);
+
+  const SERVER_URL = process.env.SERVER_URL || 'https://ton-domaine-render.onrender.com';
+
+  function sendPing() {
+    axios.get(SERVER_URL)
+      .then(res => {
+        console.log(`Ping envoyé, status: ${res.status}`);
+      })
+      .catch(err => {
+        console.error('Ping échoué:', err.message);
+      });
+  }
+
+  sendPing();
+
+  setInterval(sendPing, 10 * 60 * 1000);
 });
