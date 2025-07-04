@@ -110,7 +110,7 @@ export function updateUserUI(userData, loginBtnId = 'discord-login-btn') {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
-        fetch('http://localhost:3000/logout', {
+        fetch('https://touhou-backend.onrender.com/logout', {
           method: 'POST',
           credentials: 'include'
           })
