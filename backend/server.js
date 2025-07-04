@@ -180,7 +180,7 @@ app.get('/oauth-callback', async (req, res) => {
 
     res.cookie('token', jwtToken, {
       httpOnly: true,
-      sameSite: 'None',
+      sameSite: 'none',
       secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 1 semaine
     });
