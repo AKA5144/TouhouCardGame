@@ -40,7 +40,7 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
-// 📁 Servir un dossier statique (configurable ou fallback)
+
 const staticPath = process.env.STATIC_DIR || path.join(__dirname, 'frontend');
 app.use(express.static(staticPath));
 
@@ -49,12 +49,31 @@ const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT, // Utiliser le port 44067 de votre capture
+  connectTimeout: 30000, // 30 secondes
+  ssl: { rejectUnauthorized: false } // SSL requis par Railway
 });
 
-db.connect(err => {
-  if (err) console.error('Erreur DB:', err);
-  else console.log('✅ Connecté à la base de données');
+db.connect((err) => {
+  if (err) {
+    console.error('Erreur DB:', {
+      message: err.message,
+      code: err.code,
+      errno: err.errno,
+      syscall: err.syscall,
+      config: {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT
+      }
+    });
+  } else {
+    console.log('✅ Connecté à la base de données');
+  }
+});
+
+db.on('error', (err) => {
+  console.error('Erreur de connexion persistante:', err);
 });
 
 // 🔐 Middleware Auth
