@@ -122,19 +122,6 @@ export function updateUserUI(userData, loginBtnId = 'discord-login-btn') {
 }
 
 export async function fetchUserInfo(loginBtnId = 'discord-login-btn') {
-  storeTokenFromUrl();
-
-  try {
-    const check = await fetch('https://touhou-backend.onrender.com/check-cookie', {
-      credentials: 'include'
-    });
-    const cookieData = await check.json();
-    console.log('🧪 Cookie reçu côté backend :', cookieData);
-  } catch (err) {
-    console.error('❌ Erreur lors du test /check-cookie :', err);
-  }
-
-  // Authentification standard
   const userData = await getUserInfo();
   updateUserUI(userData, loginBtnId);
 }
