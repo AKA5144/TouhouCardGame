@@ -212,3 +212,8 @@ app.listen(port, () => {
 
   setInterval(sendPing, 10 * 60 * 1000);
 });
+
+app.get('/check-cookie', (req, res) => {
+  console.log('🍪 Cookies reçus côté backend :', req.cookies);
+  res.json({ cookies: req.cookies });
+});
