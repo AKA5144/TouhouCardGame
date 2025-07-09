@@ -162,9 +162,9 @@ app.get('/oauth-callback', async (req, res) => {
        discriminator = VALUES(discriminator),
        avatar = VALUES(avatar),
        last_login = NOW()`,
-      [user.id, user.username, user.discriminator, user.avatar],
+      [String(user.id), user.username, user.discriminator, user.avatar],
       err => {
-        if (err) console.error('Erreur insertion utilisateur en BDD:', err);
+      if (err) console.error('Erreur insertion utilisateur en BDD:', err);
       }
     );
 
