@@ -100,7 +100,7 @@ export async function loadCards(containerId = 'card-collection') {
       filteredCards.forEach(card => {
         const div = document.createElement('div');
         div.classList.add('deck_box');
-        div.textContent = deck.name;
+        div.textContent = card.name;
 
         const ownedCard = getOwnedCard(card.id);
         const isOwned = !!ownedCard;
