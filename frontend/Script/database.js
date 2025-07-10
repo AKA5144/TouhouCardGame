@@ -1,4 +1,5 @@
 export function loadDecks(containerId = 'deck-collection') {
+  console.log('loadDecks called', containerId);
   fetch('https://touhou-backend.onrender.com/deck-names')//requete vers le domaine créer par get app en backend
     .then(response => response.json())
     .then(data => {
