@@ -67,7 +67,7 @@ export async function loadCards(containerId = 'card-collection') {
       fetch('https://touhou-backend.onrender.com/cards'),
       fetch('https://touhou-backend.onrender.com/user-cards', { credentials: 'include' }),
     ]);
-    const cards = await cardsRes.json();
+  const cards = await cardsRes.json();
     const owned = userRes.ok ? (await userRes.json()).ownedCards : [];
 
     const getOwnedCard = (cardId) => owned.find(c => c.card_id === cardId) || null;
