@@ -5,7 +5,7 @@ from discord import app_commands,Embed
 from dotenv import load_dotenv
 import decks
 from Data import database
-from spawnCard import register_spawn
+from spawnCard import register_spawn, register_spawncard_debug
 
 load_dotenv()
 
@@ -23,7 +23,7 @@ async def on_ready():
         await decks.initDeck(conn, 1)
 
     register_spawn(bot.tree)
-
+    register_spawncard_debug(bot.tree)
     await bot.tree.sync(guild=None)
     print("Slash commands synchronisées.")
 

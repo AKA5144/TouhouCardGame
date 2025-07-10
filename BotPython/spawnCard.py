@@ -155,3 +155,104 @@ def draw_random_rarity():
     rarities = list(RARITY_WEIGHTS.keys())
     weights = list(RARITY_WEIGHTS.values())
     return random.choices(rarities, weights=weights, k=1)[0]
+
+def register_spawn(tree: app_commands.CommandTree):
+    @tree.command(name="spawn", description="Affiche une carte aléatoire d'un deck aléatoire")
+    async def spawn(interaction: discord.Interaction):
+        await spawn_command(interaction)
+
+def draw_random_rarity():
+    rarities = list(RARITY_WEIGHTS.keys())
+    weights = list(RARITY_WEIGHTS.values())
+    return random.choices(rarities, weights=weights, k=1)[0]
+
+
+def register_spawncard_debug(tree: app_commands.CommandTree):
+    MY_USER_ID = 350765625511247873
+
+    @tree.command(
+        name="spawncard_debug",
+        description="Spawn une carte spécifique pour un utilisateur avec une rareté donnée"
+    )
+    @app_commands.describe(
+        user="Utilisateur qui recevra la carte",
+        card_id="ID de la carte à spawn",
+        rarity="Rareté de la carte (0 à 4)"
+    )
+    async def spawncard_debug(
+        interaction: discord.Interaction,
+        user: discord.User,
+        card_id: int,
+        rarity: int,
+    ):  
+        if interaction.user.id != MY_USER_ID:
+            await interaction.response.send_message("❌ Tu n'as pas la permission d'utiliser cette commande.", ephemeral=True)
+            return
+
+        await interaction.response.defer()
+
+        if rarity < 0 or rarity > 4:
+            await interaction.followup.send("❌ La rareté doit être comprise entre 0 et 4.", ephemeral=True)
+            return
+
+        pool = await database.get_connection()
+
+        async with pool.acquire() as conn:
+            async with conn.cursor() as cursor:
+                # Vérifier que la carte existe
+                await cursor.execute("SELECT id, name, image_url, deck_id FROM card WHERE id = %s", (card_id,))
+                card_row = await cursor.fetchone()
+                if card_row is None:
+                    await interaction.followup.send(f"❌ Carte avec ID {card_id} introuvable.", ephemeral=True)
+                    return
+                _, card_name, image_path_relative, deck_id = card_row
+
+                # Récupérer le nom du deck
+                await cursor.execute("SELECT name FROM deck WHERE ID = %s", (deck_id,))
+                deck_row = await cursor.fetchone()
+                deck_name = deck_row[0] if deck_row else "Unknown deck"
+
+        image_path = os.path.normpath(os.path.join(PROJECT_ROOT, image_path_relative))
+        if not os.path.isfile(image_path):
+            await interaction.followup.send(f"❌ Image locale introuvable : `{image_path}`", ephemeral=True)
+            return
+
+        border_path = rarityMap.get(rarity)
+        if border_path is not None and not os.path.isfile(border_path):
+            await interaction.followup.send(f"❌ Bordure introuvable : `{border_path}`", ephemeral=True)
+            return
+
+        combined_image_path = os.path.join(os.path.dirname(__file__), "temp_combined_debug.png")
+        if border_path is not None:
+            compose_card_image(image_path, border_path, combined_image_path)
+        else:
+            copyfile(image_path, combined_image_path)
+
+        file = discord.File(combined_image_path, filename="card_image.png")
+
+        rarity_colors = {
+            1: 0xcd7f32,  # Bronze
+            2: 0xc0c0c0,  # Silver
+            3: 0xffd700,  # Gold
+            4: 0x9400d3,  # Rainbow
+        }
+        rarity_messages = {
+            1: "Border: Bronze",
+            2: "Border: Silver",
+            3: "Border: Gold",
+            4: "Border: Rainbow !!!!!!!!"
+        }
+
+        rarity_text = rarity_messages.get(rarity, "Border: Common")
+        color = rarity_colors.get(rarity, 0xaaaaaa)
+
+        embed = discord.Embed(
+            title=f"Debug Spawn Card : {card_name} (Deck : {deck_name})",
+            description=f"Border: {rarity_text}\nGive to : {user}",
+            color=color
+        )
+        embed.set_image(url="attachment://card_image.png")
+
+        view = AcquireCardView(user_id=user.id, card_id=card_id, rarity=rarity)
+
+        await interaction.followup.send(embed=embed, file=file, view=view)
