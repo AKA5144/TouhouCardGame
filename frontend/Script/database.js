@@ -13,7 +13,7 @@ export function loadDecks(containerId = 'deck-collection') {
       data.forEach(deck => {
         const div = document.createElement('div');
         div.classList.add('deck_box');
-        div.textContent = deck.name;
+        div.textContent = card.name;
 
         div.style.backgroundImage = `url('${deck.image_url}')`;
 
