@@ -42,5 +42,13 @@
     fetchUserInfo();
   </script>
 
+  <script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const deckName = urlParams.get('deckName') || 'BASE DECK COLLECTION';
+
+  const titleElement = document.querySelector('.title_text');
+  titleElement.textContent = decodeURIComponent(deckName);
+</script>
+
 </body>
 </html>
