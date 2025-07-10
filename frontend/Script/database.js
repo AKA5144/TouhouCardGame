@@ -27,6 +27,7 @@ export function loadDecks(containerId = 'deck-collection') {
 
         div.addEventListener('click', () => {
           const deckId = encodeURIComponent(deck.ID);
+          window.location.href = `deck.html?deckId=${deckId}`;
         });
 
         container.appendChild(div);
