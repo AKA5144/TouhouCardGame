@@ -27,8 +27,6 @@ export function loadDecks(containerId = 'deck-collection') {
 
         div.addEventListener('click', () => {
           const deckId = encodeURIComponent(deck.ID);
-          const deckName = encodeURIComponent(deck.name);
-          window.location.href = `deck.html?deckId=${deckId}&deckName=${deckName}`;
         });
 
         container.appendChild(div);
@@ -49,7 +47,7 @@ export async function loadCards(containerId = 'card-collection') {
 
   try {
     const res = await fetch('https://touhou-backend.onrender.com/default-card');
-   const data = await res.json();
+    const data = await res.json();
     defaultImage = data.image_url;
   } catch (error) {
     console.error('Erreur chargement image par défaut :', error);
@@ -68,7 +66,6 @@ export async function loadCards(containerId = 'card-collection') {
       fetch('https://touhou-backend.onrender.com/cards'),
       fetch('https://touhou-backend.onrender.com/user-cards', { credentials: 'include' }),
     ]);
-
     const cards = await cardsRes.json();
     const owned = userRes.ok ? (await userRes.json()).ownedCards : [];
 
@@ -101,8 +98,8 @@ export async function loadCards(containerId = 'card-collection') {
 
       filteredCards.forEach(card => {
         const div = document.createElement('div');
-        div.classList.add('card_box');
-        div.style.position = 'relative';
+        div.classList.add('deck_box');
+        div.textContent = deck.name;
 
         const ownedCard = getOwnedCard(card.id);
         const isOwned = !!ownedCard;
