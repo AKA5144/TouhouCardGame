@@ -111,23 +111,73 @@ app.get('/user-info', authenticateToken, (req, res) => {
 });
 
 app.get('/user-cards', authenticateToken, (req, res) => {
-  db.query('SELECT card_id FROM user_cards WHERE discord_id = ?', [req.user.id], (err, results) => {
-    if (err) return res.status(500).send('Erreur serveur');
-    const cardIds = results.map(row => row.card_id);
-    res.json({ ownedCards: cardIds });
+  const userId = req.user.id;
+
+  const query = `
+    SELECT card_id, quantity_by_rarity
+    FROM user_cards
+    WHERE discord_id = ?
+  `;
+
+  const defaultQuantity = { "0": 1, "1": 0, "2": 0, "3": 0, "4": 0 };
+  const updatePromises = [];
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des cartes du joueur :', err);
+      return res.status(500).send('Erreur serveur');
+    }
+
+    const ownedCards = results.map(row => {
+      let quantity;
+      let needUpdate = false;
+
+      if (row.quantity_by_rarity === null) {
+        quantity = defaultQuantity;
+        needUpdate = true;
+      } else if (typeof row.quantity_by_rarity === 'string') {
+        try {
+          quantity = JSON.parse(row.quantity_by_rarity);
+        } catch {
+          quantity = defaultQuantity;
+          needUpdate = true;
+        }
+      } else if (typeof row.quantity_by_rarity === 'object') {
+        quantity = row.quantity_by_rarity; 
+      } else {
+        quantity = defaultQuantity;
+        needUpdate = true;
+      }
+
+      if (needUpdate) {
+        const updateQuery = `
+          UPDATE user_cards 
+          SET quantity_by_rarity = ? 
+          WHERE discord_id = ? AND card_id = ?
+        `;
+        const updatePromise = new Promise((resolve, reject) => {
+          db.query(updateQuery, [JSON.stringify(defaultQuantity), userId, row.card_id], (err) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve();
+          });
+        });
+        updatePromises.push(updatePromise);
+      }
+
+      return {
+        card_id: row.card_id,
+        quantity_by_rarity: quantity
+      };
+    });
+
+    Promise.allSettled(updatePromises).then(() => {
+      res.json({ ownedCards });
+    });
   });
 });
 
-app.post('/logout', (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    sameSite: 'None',
-    secure: true,
-    path: '/',
-    // domain: 'example.com', // idem si défini à la création
-  });
-  res.status(200).send({ message: 'Déconnecté' });
-});
 
 app.get('/oauth-callback', async (req, res) => {
   const { code, state } = req.query;
@@ -188,7 +238,7 @@ app.get('/oauth-callback', async (req, res) => {
     if (state) return res.redirect(decodeURIComponent(state));
     res.redirect('/');
   } catch (error) {
-    console.error('Erreur Discord:', error.response?.data || error.message);
+    console.error('[OAuth2][Discord Error]', error.response?.data || error.message);
     res.status(500).send('Erreur authentification Discord');
   }
 });
