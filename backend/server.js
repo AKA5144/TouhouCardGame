@@ -80,7 +80,7 @@ function authenticateToken(req, res, next) {
 
 // 📦 Routes
 app.get('/deck-names', (req, res) => {
-  db.query('SELECT ID, name, image_url, image_hover_url, link FROM deck', (err, results) => {
+  db.query('SELECT ID, name, image_url, image_hover_url FROM deck', (err, results) => {
     if (err) return res.status(500).send('Erreur serveur');
     res.json(results);
   });
