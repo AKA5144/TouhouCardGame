@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <link rel="stylesheet" href="frontend/Style/main.css" />
   <link rel="stylesheet" href="frontend/Style/userDecks.css" />
+  <link rel="stylesheet" href="frontend/Style/deck.css" />
   <link rel="stylesheet" href="frontend/Style/button.css" />
   <title>Touhou Card Game - Deck</title>
 </head>
@@ -11,16 +12,20 @@
   <div class="overlay_box">
 
     <div id="discord-login-container"></div>
+    
+      <a href="index.html" class="title_link">
+        <p class="title_text">TOUHOU CARD GAME</p>
+      </a>
 
-    <p class="title_text">BASE DECK COLLECTION</p>
     <a class="title_deck" href="index.html">back to deck</a>
+
     <div class="switch-container">
         <label class="switch">
           <input type="checkbox" />
           <span class="slider"></span>
         </label>
       <span class="switch-text">see non possessed card</span>
-</div>
+    </div>
 
     <div class="card_collection_box" id="card-collection"></div>
     </div>
@@ -44,7 +49,7 @@
 
   <script>
   const urlParams = new URLSearchParams(window.location.search);
-  const deckName = urlParams.get('deckName') || 'BASE DECK COLLECTION';
+  const deckName = urlParams.get('deckName') || 'Your Collection';
 
   const titleElement = document.querySelector('.title_text');
   titleElement.textContent = decodeURIComponent(deckName);

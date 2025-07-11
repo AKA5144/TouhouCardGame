@@ -33,18 +33,6 @@ body {
 }
 
 
-.title_text{
-  position: absolute;  
-  top: 1%;  
-  left: 50%;
-  font-size: 2vw;
-  text-align: center;
-  font-family: Logopixies;
-  text-shadow: 0.25vw 0.4vw 1vw black;
-  transform: translate(-50%, -50%) ;
-  z-index: 11;  
-}
-
 .card_collection_box {
       position: relative;
       width: 85%;

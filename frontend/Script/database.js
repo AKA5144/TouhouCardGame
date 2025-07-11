@@ -75,7 +75,7 @@ export async function loadCards(containerId = 'card-collection') {
 
     const filteredCards = selectedDeckId
       ? cards.filter(card => String(card.deck_id) === String(selectedDeckId))
-      : cards;
+      : cards.filter(card => card.deck_id !== -1);
 
     const switchInput = document.querySelector('.switch input');
     const showRealImages = switchInput?.checked ?? false;
