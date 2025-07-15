@@ -11,27 +11,23 @@
 <body>
   <div class="overlay_box">
 
-    <div id="discord-login-container"></div>
-    
+      <div id="discord-login-container"></div>
+
       <a href="index.html" class="title_link">
         <p class="title_text">TOUHOU CARD GAME</p>
       </a>
-
-    <a class="title_deck" href="index.html">back to deck</a>
+      <a class="title_deck" href="index.html">back to deck</a>
+      <a class="card_collection_box" id="card-collection"></a>
+    </div>
 
     <div class="switch-container">
+      <span class="switch-text">see non possessed card</span>
         <label class="switch">
           <input type="checkbox" />
           <span class="slider"></span>
         </label>
-      <span class="switch-text">see non possessed card</span>
     </div>
-
-    <div class="card_collection_box" id="card-collection"></div>
-    </div>
-    
   </div>
-
   <script type="module">
     import { renderDiscordLogin } from './frontend/Script/userDecks.js';
     renderDiscordLogin('discord-login-container');

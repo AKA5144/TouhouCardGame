@@ -3,6 +3,9 @@
   src: url('../../Assets/Font/Logopixies-owwBB.ttf') format('truetype');
 }
 
+
+
+
 html, body {
   margin: 0;
   padding: 0;
@@ -97,10 +100,9 @@ html, body {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  margin-left: -50%; 
+  margin-left: 0%; 
   transition: width 0.15s, height 0.15s, font-size 0.05s;
 }
-
 .ShowDeckBox:hover {
   box-shadow: 0.20vw 0.4vw 1vw white;
   width: 310px;
@@ -137,4 +139,28 @@ html, body {
   font-size: 33px;
   background-image: url('../../Assets/Decks/Default/cirno-surprised.webp');
   cursor: pointer;
+}
+
+@media screen and (min-width: 1200px) {
+  .ShowDeckBox {
+    width: 250px;
+    height: 350px;
+    font-size: 25px;
+    margin-left: -35%; 
+  }
+  .ShowDeckBox:hover {
+    width: 260px;
+    height: 360px;
+    font-size: 28px;
+  }
+  .PersonnalDeckBox {
+    width: 120px;
+    height: 200px;
+    font-size: 25px;
+  }
+  .PersonnalDeckBox:hover {
+    width: 130px;
+    height: 210px;
+    font-size: 28px;
+  }
 }

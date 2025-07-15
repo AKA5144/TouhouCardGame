@@ -60,22 +60,16 @@
 
 .switch-container {
   position: fixed;
-  top: 160px;
-  right: 1600px;
+  top: 10%;
+  left: 0%;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
   margin: 0;
   width: fit-content;
-  height: 26px; 
+  height: auto; 
   z-index: 1000;
-}
-
-.switch-container {
-  display: flex;
-  align-items: center; 
-  gap: 10px;
 }
 
 .switch-text {
@@ -125,4 +119,27 @@
 
 .switch input:checked + .slider:before {
   transform: translateX(24px);
+}
+
+@media screen and (min-width: 1024px) and (min-height: 600px) {
+  .switch-container {
+    position: fixed;
+    top: 25%;
+    left: 1%;
+
+  }
+  .switch-text {
+    font-size: 14px;
+  }
+}
+
+@media screen and (min-width: 1400px){
+
+  .switch-container {
+  top: 25%;
+  left: 4%;
+}
+  .switch-text {
+    font-size: 20px;
+  }
 }
