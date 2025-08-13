@@ -1,10 +1,9 @@
 export function discordButton(){
   const clientId = '1386612121181093939';
-  const redirectUri = 'https://touhou-backend.onrender.com/oauth-callback'; 
+  const redirectUri = 'http://localhost:3000/oauth-callback'; 
   const scope = 'identify';
   const responseType = 'code';
 
-  // Encode l'URL actuelle dans state pour s'en souvenir
   const currentUrl = window.location.href;
   const state = encodeURIComponent(currentUrl);
 
@@ -26,6 +25,7 @@ export function getQueryParams() {
 export function setWelcomeMessage(elementId, usernameParam = 'username') {
   const params = getQueryParams();
   const username = params[usernameParam];
+  console.log(username);
   if (username) {
     const el = document.getElementById(elementId);
     if (el) el.textContent = `Bienvenue, ${username} !`;
@@ -34,7 +34,7 @@ export function setWelcomeMessage(elementId, usernameParam = 'username') {
 
 export async function getUserInfo() {
   try {
-    const response = await fetch('https://touhou-backend.onrender.com/user-info', {
+    const response = await fetch('http://localhost:3000/user-info', {
       credentials: 'include',
     });
 
@@ -110,10 +110,10 @@ export function updateUserUI(userData, loginBtnId = 'discord-login-btn') {
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
-        fetch('https://touhou-backend.onrender.com/logout', {
+        fetch('http://localhost:3000/logout', {
           method: 'POST',
-          credentials: 'include',
-        })
+          credentials: 'include'
+          })
         .then(() => window.location.reload())
         .catch(err => console.error('Erreur logout:', err));
       });

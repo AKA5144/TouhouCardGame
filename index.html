@@ -2,34 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="frontend/Style/main.css" />
-  <link rel="stylesheet" href="frontend/Style/userDecks.css" />
-  <link rel="stylesheet" href="frontend/Style/button.css" />
   <title>Touhou Card Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 <body>
-  <div class="overlay_box">
-
-      <div id="discord-login-container"></div>
-
-      <a href="index.html" class="title_link">
-        <p class="title_text">TOUHOU CARD GAME</p>
-      </a>
-      
-      <div class="innerContainerBox">
-        <a class="ShowDeckBox" href="deck.html">Show Decks</a>
-        <a class="PersonnalDeckBox" href="userDecks.html">Your Collection</a>
-      </div>
-    </div>
-  </div>
-  <script type="module">
-    import { renderDiscordLogin } from './frontend/Script/userDecks.js';
-    renderDiscordLogin('discord-login-container');
-  </script>
-  <script type="module">
-    import { fetchUserInfo } from './frontend/Script/userDecks.js';
-    fetchUserInfo();
-  </script>
-
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>

@@ -1,38 +1,50 @@
 import os
+import random
+import requests
+from io import BytesIO
 from PIL import Image
 import discord
-from discord import Embed
+from discord import app_commands
+from discord.ui import View
+from discord.ext import commands
+from shutil import copyfile
 from Data import database
 from Data.user_utils import ensure_user_registered
-from discord.ui import View, Button
-from discord import app_commands
-import random
-from shutil import copyfile
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
+# URL du front qui contient les images (public/)
+FRONT_URL = "http://localhost:5173"  
+
+# Bordures par rareté
 rarityMap = {
-    0: None,  # Pas de bordure pour les cartes Common
-    1: os.path.normpath(os.path.join(PROJECT_ROOT, "Assets", "Border", "bronze.png")),
-    2: os.path.normpath(os.path.join(PROJECT_ROOT, "Assets", "Border", "silver.png")),
-    3: os.path.normpath(os.path.join(PROJECT_ROOT, "Assets", "Border", "gold.png")),
-    4: os.path.normpath(os.path.join(PROJECT_ROOT, "Assets", "Border", "rainbow.png")),
+    0: None,  # Pas de bordure pour Common
+    1: f"{FRONT_URL}/Assets/Border/bronze.png",
+    2: f"{FRONT_URL}/Assets/Border/silver.png",
+    3: f"{FRONT_URL}/Assets/Border/gold.png",
+    4: f"{FRONT_URL}/Assets/Border/rainbow.png",
 }
 
+# Poids pour tirage aléatoire
 RARITY_WEIGHTS = {
-    0: 85,  # Common
-    1: 10,  # Bronze
-    2: 4,  # Silver
-    3: 0.75,   # Gold
-    4: 0.25    # Rainbow
+    0: 85,
+    1: 10,
+    2: 4,
+    3: 0.75,
+    4: 0.25
 }
 
-def compose_card_image(card_path, border_path, output_path):
-    card_img = Image.open(card_path).convert("RGBA")
-    border_img = Image.open(border_path).convert("RGBA")
+def load_image_from_url(url: str) -> Image.Image:
+    """Télécharge une image depuis une URL et la convertit en RGBA."""
+    resp = requests.get(url)
+    resp.raise_for_status()
+    return Image.open(BytesIO(resp.content)).convert("RGBA")
+
+def compose_card_image(card_url: str, border_url: str, output_path: str):
+    """Fusionne la carte et la bordure (les 2 depuis URL) et sauvegarde en PNG."""
+    card_img = load_image_from_url(card_url)
+    border_img = load_image_from_url(border_url)
     border_img = border_img.resize(card_img.size)
     combined = Image.alpha_composite(card_img, border_img)
-    combined.save(output_path)
+    combined.save(output_path, format="PNG")
 
 class AcquireCardView(View):
     def __init__(self, user_id: int, card_id: int, rarity: int = 1):
@@ -51,21 +63,18 @@ class AcquireCardView(View):
         async with pool.acquire() as conn:
             async with conn.cursor() as cursor:
                 rarity_str = str(self.rarity)
-                json_path = f'$."{rarity_str}"'  # JSON path littéral
-                
-                # Construire la requête en insérant le JSON path directement dans la chaîne
+                json_path = f'$."{rarity_str}"'
                 query = f"""
-INSERT INTO user_cards (discord_id, card_id, quantity_by_rarity, first_acquired_at, last_acquired_at)
-VALUES (%s, %s, JSON_SET('{{"0": 0, "1": 0, "2": 0, "3": 0, "4": 0}}', '{json_path}', 1), NOW(), NOW())
-ON DUPLICATE KEY UPDATE
-    quantity_by_rarity = JSON_SET(
-        quantity_by_rarity,
-        '{json_path}',
-        COALESCE(CAST(JSON_EXTRACT(quantity_by_rarity, '{json_path}') AS UNSIGNED), 0) + 1
-    ),
-    last_acquired_at = NOW()
-"""
-                # Attention, seuls user_id et card_id sont passés en paramètres ici
+                INSERT INTO user_cards (discord_id, card_id, quantity_by_rarity, first_acquired_at, last_acquired_at)
+                VALUES (%s, %s, JSON_SET('{{"0": 0, "1": 0, "2": 0, "3": 0, "4": 0}}', '{json_path}', 1), NOW(), NOW())
+                ON DUPLICATE KEY UPDATE
+                    quantity_by_rarity = JSON_SET(
+                        quantity_by_rarity,
+                        '{json_path}',
+                        COALESCE(CAST(JSON_EXTRACT(quantity_by_rarity, '{json_path}') AS UNSIGNED), 0) + 1
+                    ),
+                    last_acquired_at = NOW()
+                """
                 await cursor.execute(query, (self.user_id, self.card_id))
                 await conn.commit()
 
@@ -80,7 +89,7 @@ async def spawn_command(interaction: discord.Interaction):
         async with conn.cursor() as cursor:
             await cursor.execute("SELECT ID, name FROM deck ORDER BY RAND() LIMIT 1")
             deck_row = await cursor.fetchone()
-            if deck_row is None:
+            if not deck_row:
                 await interaction.followup.send("❌ Aucun deck trouvé.")
                 return
             deck_id, deck_name = deck_row
@@ -90,60 +99,39 @@ async def spawn_command(interaction: discord.Interaction):
                 (deck_id,)
             )
             card_row = await cursor.fetchone()
-            if card_row is None:
+            if not card_row:
                 await interaction.followup.send(f"❌ Aucune carte trouvée dans le deck `{deck_name}`.")
                 return
-            card_id, card_name, image_path_relative = card_row
+            card_id, card_name, image_url_relative = card_row
 
-    # Construire le chemin absolu à partir de la racine projet
-    image_path = os.path.normpath(os.path.join(PROJECT_ROOT, image_path_relative))
-
-    if not os.path.isfile(image_path):
-        await interaction.followup.send(f"❌ Image locale introuvable : `{image_path}`")
-        return
-
+    # Construire l'URL complète de l'image de la carte
+    card_url = f"{FRONT_URL}/{image_url_relative.lstrip('/')}"
     rarity = draw_random_rarity()
-    border_path = rarityMap.get(rarity)
-    if border_path is not None:
-        if not os.path.isfile(border_path):
-            await interaction.followup.send(f"❌ Bordure introuvable : `{border_path}`")
-            return
-    else:
-        border_path = None
+    border_url = rarityMap.get(rarity)
 
     combined_image_path = os.path.join(os.path.dirname(__file__), "temp_combined.png")
-
-    if border_path is not None:
-     compose_card_image(image_path, border_path, combined_image_path)
+    if border_url:
+        compose_card_image(card_url, border_url, combined_image_path)
     else:
-     copyfile(image_path, combined_image_path)
+        # Juste télécharger la carte si pas de bordure
+        img = load_image_from_url(card_url)
+        img.save(combined_image_path, format="PNG")
 
     file = discord.File(combined_image_path, filename="card_image.png")
-    rarity_colors = {
-    1: 0xcd7f32,  # Bronze
-    2: 0xc0c0c0,  # Silver
-    3: 0xffd700,  # Gold
-    4: 0x9400d3,  # Rainbow → Violet
-}
-    rarity_messages = {
-            1: "Border: Bronze",
-            2: "Border: Silver",
-            3: "Border: Gold",
-            4: "Border: Rainbow !!!!!!!!"
-            }
 
+    rarity_colors = {1: 0xcd7f32, 2: 0xc0c0c0, 3: 0xffd700, 4: 0x9400d3}
+    rarity_messages = {1: "Border: Bronze", 2: "Border: Silver", 3: "Border: Gold", 4: "Border: Rainbow !!!!!!!!"}
     rarity_text = rarity_messages.get(rarity, "Border: Common")
-    color = rarity_colors.get(rarity, 0xaaaaaa) 
+    color = rarity_colors.get(rarity, 0xaaaaaa)
 
     embed = discord.Embed(
-    title=f"Card : {card_name} (Deck : {deck_name})",
-    description=f"Border: {rarity_text}",
-    color=color
-)
+        title=f"Card : {card_name} (Deck : {deck_name})",
+        description=f"Border: {rarity_text}",
+        color=color
+    )
     embed.set_image(url="attachment://card_image.png")
 
     view = AcquireCardView(user_id=interaction.user.id, card_id=card_id, rarity=rarity)
-
     await interaction.followup.send(embed=embed, file=file, view=view)
 
 def register_spawn(tree: app_commands.CommandTree):
@@ -156,15 +144,6 @@ def draw_random_rarity():
     weights = list(RARITY_WEIGHTS.values())
     return random.choices(rarities, weights=weights, k=1)[0]
 
-def register_spawn(tree: app_commands.CommandTree):
-    @tree.command(name="spawn", description="Affiche une carte aléatoire d'un deck aléatoire")
-    async def spawn(interaction: discord.Interaction):
-        await spawn_command(interaction)
-
-def draw_random_rarity():
-    rarities = list(RARITY_WEIGHTS.keys())
-    weights = list(RARITY_WEIGHTS.values())
-    return random.choices(rarities, weights=weights, k=1)[0]
 
 
 def register_spawncard_debug(tree: app_commands.CommandTree):

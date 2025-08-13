@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="frontend/Style/main.css" />
+  <link rel="stylesheet" href="frontend/Style/userDecks.css" />
+  <link rel="stylesheet" href="frontend/Style/userDecks.css" />
+  <link rel="stylesheet" href="frontend/Style/button.css" />
+  <title>Touhou Card Game - Deck</title>
+</head>
+<body>
+  <div class="overlay_box">
+
+      <div id="discord-login-container"></div>
+
+      <a href="index.html" class="title_link">
+        <p class="title_text">TOUHOU CARD GAME</p>
+      </a>
+      <a class="card_collection_box" id="card-collection"></a>
+    </div>
+  <script type="module">
+    import { renderDiscordLogin } from './frontend/Script/userDecks.js';
+    renderDiscordLogin('discord-login-container');
+  </script>
+
+  <script type="module">
+    import { loadCards } from './frontend/Script/gambling/userCollection.js';
+    loadCards();
+  </script>
+
+  <script type="module">
+    import { fetchUserInfo } from './frontend/Script/userDecks.js';
+    fetchUserInfo();
+  </script>
+
+
+</body>
+</html>

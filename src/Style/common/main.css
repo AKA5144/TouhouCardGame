@@ -1,0 +1,48 @@
+@font-face {
+  font-family: 'Logopixies';
+  src: url('/Assets/Font/Logopixies-owwBB.ttf') format('truetype');
+}
+
+body {
+  background-image: url('/Assets/Main/Background.png');
+  background-repeat: no-repeat;
+  background-size: cover;   
+  background-position: center center;
+  background-attachment: fixed;     
+
+  display: flex; 
+  justify-content: center; 
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Logopixies;
+  font-size: 10px;
+  text-align: center;
+}
+
+
+.overlay_box {
+  position: relative;
+  width: 70vw;
+  max-width: 1000px;
+  min-width: 100px;
+  min-height: 100vh;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto;
+}
+
+.title_text {
+  margin-top: 20px;          /* ajoute un top spacing si besoin */
+  text-shadow: 0.25vw 0.4vw 1vw black;
+  z-index: 11;
+  text-align: center;
+}
