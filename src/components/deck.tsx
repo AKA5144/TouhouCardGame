@@ -47,7 +47,7 @@ export default function DeckDisplay() {
   const [deck, setDeck] = useState<Deck[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/deck")
+    fetch("https://TouhouCardGameBackend.onrender.com/deck")
       .then((res) => res.json())
       .then((data) => setDeck(data))
       .catch((err) => console.error(err));

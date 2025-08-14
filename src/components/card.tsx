@@ -20,10 +20,8 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
   const placeholderImageUrl = placeholder?.image_url || "";
   const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
 
-  // Stocke l’index de la bordure affichée par carte
   const [borderIndexes, setBorderIndexes] = useState<Record<number, number>>({});
 
-  // Initialise les bordures avec la plus haute rareté possédée
   useEffect(() => {
     const initialIndexes: Record<number, number> = {};
 

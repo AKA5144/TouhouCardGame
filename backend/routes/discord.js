@@ -52,7 +52,7 @@ authRouter.get('/discord/callback', async (req, res) => {
     id: user.id,
     username: user.username,
     global_name: user.global_name,
-    avatar: user.avatar // 👈 ajoute ça
+    avatar: user.avatar 
   },
   process.env.JWT_SECRET,
   { expiresIn: '7d' }
@@ -66,7 +66,8 @@ authRouter.get('/discord/callback', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect(`http://localhost:5173`);
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(FRONTEND_URL);
   } catch (err) {
     console.error('OAuth error:', err.response?.data || err.message);
     res.status(500).send('OAuth failed');

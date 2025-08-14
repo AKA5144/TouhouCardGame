@@ -26,7 +26,7 @@ export default function DeckDetailPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:3001/deck/user-cards?deckId=${encodeURIComponent(deckId)}`, {
+    fetch(`TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${encodeURIComponent(deckId)}`, {
       credentials: "include",
     })
       .then((res) => {

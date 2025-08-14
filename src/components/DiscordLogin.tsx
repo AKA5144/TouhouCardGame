@@ -3,7 +3,7 @@ import "../Style/common/discord.css";
 //TO DO
 //ENREGISTRER USER SI PREMIER LOGIN
 const CLIENT_ID = "1386612121181093939";
-const REDIRECT_URI = "http://localhost:3001/oauth/discord/callback";
+const REDIRECT_URI = "TouhouCardGameBackend.onrender.com/oauth/discord/callback";
 
 const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
   REDIRECT_URI
@@ -21,7 +21,7 @@ export default function DiscordLogin() {
   const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/oauth/me", {
+    fetch("https://TouhouCardGameBackend.onrender.com/oauth/me", {
       credentials: "include",
     })
       .then((res) => {
@@ -78,7 +78,7 @@ export default function DiscordLogin() {
                 </p>
                 <button
                   onClick={() => {
-                    fetch("http://localhost:3000/oauth/logout", {
+                    fetch("TouhouCardGameBackend.onrender.com/oauth/logout", {
                       method: "POST",
                       credentials: "include",
                     }).then(() => window.location.reload());
@@ -111,7 +111,7 @@ export default function DiscordLogin() {
 }
 
 function handleLogout() {
-fetch("http://localhost:3001/oauth/logout", {
+fetch("TouhouCardGameBackend.onrender.com/oauth/logout", {
   method: "POST",
   credentials: "include", 
 })
