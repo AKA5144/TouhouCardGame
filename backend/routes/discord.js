@@ -22,6 +22,8 @@ export function verifyToken(req, res, next) {
 
 authRouter.get('/discord/callback', async (req, res) => {
   const code = req.query.code;
+  console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID);
+  console.log('DISCORD_REDIRECT_URI:', process.env.DISCORD_REDIRECT_URI);
   if (!code) return res.status(400).send('Missing code');
 
   // Vérification des variables d'environnement
