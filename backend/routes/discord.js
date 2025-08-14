@@ -24,40 +24,43 @@ authRouter.get('/discord/callback', async (req, res) => {
   const code = req.query.code;
   if (!code) return res.status(400).send('Missing code');
 
+  // Vérification des variables d'environnement
+  if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET || !process.env.DISCORD_REDIRECT_URI) {
+    console.error('Missing Discord environment variables');
+    return res.status(500).send('Server misconfigured');
+  }
+
   try {
-    const tokenRes = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
-      client_id: process.env.DISCORD_CLIENT_ID,
-      client_secret: process.env.DISCORD_CLIENT_SECRET,
-      grant_type: 'authorization_code',
-      code: code.toString(),
-      redirect_uri: process.env.DISCORD_REDIRECT_URI,
-    }), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    });
+    const tokenRes = await axios.post(
+      'https://discord.com/api/oauth2/token',
+      new URLSearchParams({
+        client_id: process.env.DISCORD_CLIENT_ID.trim(),
+        client_secret: process.env.DISCORD_CLIENT_SECRET.trim(),
+        grant_type: 'authorization_code',
+        code: code.toString(),
+        redirect_uri: process.env.DISCORD_REDIRECT_URI.trim(),
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
 
     const accessToken = tokenRes.data.access_token;
 
     const userRes = await axios.get('https://discord.com/api/users/@me', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const user = userRes.data;
 
     const token = jwt.sign(
-  {
-    id: user.id,
-    username: user.username,
-    global_name: user.global_name,
-    avatar: user.avatar 
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: '7d' }
-);
-
+      {
+        id: user.id,
+        username: user.username,
+        global_name: user.global_name,
+        avatar: user.avatar
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
 
     res.cookie('token', token, {
       httpOnly: true,
@@ -66,8 +69,9 @@ authRouter.get('/discord/callback', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const FRONTEND_URL = process.env.FRONTEND_URL?.trim() || 'http://localhost:5173';
     res.redirect(FRONTEND_URL);
+
   } catch (err) {
     console.error('OAuth error:', err.response?.data || err.message);
     res.status(500).send('OAuth failed');
@@ -87,4 +91,3 @@ authRouter.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "Logged out successfully" });
 });
-
