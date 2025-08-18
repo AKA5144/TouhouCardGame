@@ -79,7 +79,7 @@ authRouter.get('/discord/callback', async (req, res) => {
 
 
 
-    const redirectUrl = state ? decodeURIComponent(state) : '/';
+    const redirectUrl = state ? decodeURIComponent(state) : 'https://aka5144.github.io/TouhouCardGame/';
     res.redirect(redirectUrl);
 
   } catch (err) {

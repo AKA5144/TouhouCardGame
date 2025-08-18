@@ -6,8 +6,8 @@ const CLIENT_ID = "1386612121181093939";
 const REDIRECT_URI = "https://touhoucardgamebackend.onrender.com/oauth/discord/callback";
 
 function getDiscordAuthUrl() {
-  const currentPath = window.location.pathname; 
-  const state = encodeURIComponent(currentPath);
+  const currentUrl = window.location.href; 
+  const state = encodeURIComponent(currentUrl);
   return `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
     REDIRECT_URI
   )}&response_type=code&scope=identify&state=${state}`;
