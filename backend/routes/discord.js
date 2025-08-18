@@ -20,25 +20,18 @@ export function verifyToken(req, res, next) {
   }
 }
 
-authRouter.get('/discord/callback', async (req, res) => {
+app.get('/discord/callback', async (req, res) => {
   const code = req.query.code;
-
-  // Logs utiles
-  console.log('--- DISCORD OAUTH CALLBACK ---');
-  console.log('Code reçu:', code);
-  console.log('DISCORD_CLIENT_ID:', process.env.DISCORD_CLIENT_ID);
-  console.log('DISCORD_REDIRECT_URI:', process.env.DISCORD_REDIRECT_URI);
+  const state = req.query.state; 
 
   if (!code) return res.status(400).send('Missing code');
 
-  // Vérification des variables d'environnement
   if (!process.env.DISCORD_CLIENT_ID || !process.env.DISCORD_CLIENT_SECRET || !process.env.DISCORD_REDIRECT_URI) {
     console.error('❌ Missing Discord environment variables');
     return res.status(500).send('Server misconfigured');
   }
 
   try {
-    // Préparer les paramètres pour Discord
     const params = new URLSearchParams({
       client_id: process.env.DISCORD_CLIENT_ID.trim(),
       client_secret: process.env.DISCORD_CLIENT_SECRET.trim(),
@@ -47,16 +40,11 @@ authRouter.get('/discord/callback', async (req, res) => {
       redirect_uri: process.env.DISCORD_REDIRECT_URI.trim(),
     });
 
-    console.log('Payload envoyé à Discord:', Object.fromEntries(params));
-
-    // Échanger le code contre un token
     const tokenRes = await axios.post(
       'https://discord.com/api/oauth2/token',
       params,
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
-
-    console.log('Réponse token Discord:', tokenRes.data);
 
     if (!tokenRes.data.access_token) {
       console.error('❌ Aucun access_token reçu de Discord');
@@ -65,15 +53,12 @@ authRouter.get('/discord/callback', async (req, res) => {
 
     const accessToken = tokenRes.data.access_token;
 
-    // Récupérer les infos utilisateur
     const userRes = await axios.get('https://discord.com/api/users/@me', {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
     const user = userRes.data;
-    console.log('Utilisateur Discord:', user);
 
-    // Créer un JWT
     const token = jwt.sign(
       {
         id: user.id,
@@ -85,7 +70,6 @@ authRouter.get('/discord/callback', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // Stocker le JWT en cookie
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -93,10 +77,9 @@ authRouter.get('/discord/callback', async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    const FRONTEND_URL = process.env.FRONTEND_URL?.trim() || 'http://localhost:5173';
-    console.log('Redirection vers:', FRONTEND_URL);
 
-    res.redirect(FRONTEND_URL);
+    const redirectUrl = state ? decodeURIComponent(state) : (process.env.FRONTEND_URL?.trim() || 'https://aka5144.github.io/TouhouCardGame');
+    res.redirect(redirectUrl);
 
   } catch (err) {
     console.error('OAuth error:', err.response?.data || err.message);

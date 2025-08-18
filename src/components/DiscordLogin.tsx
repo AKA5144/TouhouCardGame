@@ -5,9 +5,13 @@ import "../Style/common/discord.css";
 const CLIENT_ID = "1386612121181093939";
 const REDIRECT_URI = "https://touhoucardgamebackend.onrender.com/oauth/discord/callback";
 
-const DISCORD_AUTH_URL = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
-  REDIRECT_URI
-)}&response_type=code&scope=identify`;
+function getDiscordAuthUrl() {
+  const currentPath = window.location.pathname; // dernière page visitée
+  const state = encodeURIComponent(currentPath);
+  return `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&response_type=code&scope=identify&state=${state}`;
+}
 
 interface User {
   id: string;
@@ -99,7 +103,7 @@ export default function DiscordLogin() {
 
   return (
     <div id="discord-login-container" className="w-12 sm:w-32 md:w-40 lg:w-48">
-      <a className="discord-btn text-[6px] sm:text-sm md:text-base lg:text-lg" href={DISCORD_AUTH_URL}>
+      <a className="discord-btn text-[6px] sm:text-sm md:text-base lg:text-lg" href={getDiscordAuthUrl()}>
         Login
       </a>
     </div>
