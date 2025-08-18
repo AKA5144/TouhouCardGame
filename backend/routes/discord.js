@@ -78,7 +78,8 @@ authRouter.get('/discord/callback', async (req, res) => {
     });
 
 
-    const redirectUrl = state ? decodeURIComponent(state) : (process.env.FRONTEND_URL?.trim() || 'https://aka5144.github.io/TouhouCardGame');
+
+    const redirectUrl = state ? decodeURIComponent(state) : '/';
     res.redirect(redirectUrl);
 
   } catch (err) {
