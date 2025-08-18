@@ -20,7 +20,7 @@ export function verifyToken(req, res, next) {
   }
 }
 
-app.get('/discord/callback', async (req, res) => {
+authRouter.get('/discord/callback', async (req, res) => {
   const code = req.query.code;
   const state = req.query.state; 
 
