@@ -19,39 +19,32 @@ interface CardListProps {
 export default function CardDisplay({ cards, placeholder }: CardListProps) {
   const placeholderImageUrl = placeholder?.image_url || "";
   const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
-
   const [borderIndexes, setBorderIndexes] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const initialIndexes: Record<number, number> = {};
-
     cards.forEach((card) => {
       if (card.owned && card.quantity_by_rarity) {
         const ownedRarities = Object.entries(card.quantity_by_rarity)
           .filter(([_, qty]) => qty > 0)
           .map(([rarity]) => parseInt(rarity))
           .sort((a, b) => a - b);
-
         if (ownedRarities.length > 0) {
           const highest = Math.max(...ownedRarities);
           initialIndexes[card.id] = ownedRarities.indexOf(highest);
         }
       }
     });
-
     setBorderIndexes(initialIndexes);
   }, [cards]);
 
   const handleCardClick = (card: Card) => {
     if (!card.owned || !card.quantity_by_rarity) return;
-
     const ownedRarities = Object.entries(card.quantity_by_rarity)
       .filter(([_, qty]) => qty > 0)
       .map(([rarity]) => parseInt(rarity))
       .sort((a, b) => a - b);
-
     if (ownedRarities.length === 0) return;
-
     setBorderIndexes((prev) => {
       const currentIndex = prev[card.id] ?? 0;
       const nextIndex = (currentIndex + 1) % ownedRarities.length;
@@ -65,23 +58,26 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
         const highestRarity = card.quantity_by_rarity
           ? getHighestRarity(card.quantity_by_rarity)
           : null;
-
         const ownedRarities = card.quantity_by_rarity
           ? Object.entries(card.quantity_by_rarity)
               .filter(([_, qty]) => qty > 0)
               .map(([rarity]) => parseInt(rarity))
               .sort((a, b) => a - b)
           : [];
-
         const currentRarity =
           ownedRarities[borderIndexes[card.id] ?? 0] ?? highestRarity;
+
+        // Chemins corrigés pour GitHub Pages
+        const cardImageUrl = card.owned
+          ? `/TouhouCardGame/${card.image_url}`
+          : `/TouhouCardGame/${placeholderImageUrl}`;
 
         return (
           <div
             key={card.id}
             className="card relative"
             style={{
-              backgroundImage: `url(${card.owned ? card.image_url : placeholderImageUrl})`,
+              backgroundImage: `url(${cardImageUrl})`,
               cursor: card.owned ? "pointer" : "default",
               height: "270px",
               width: "180px",
@@ -92,23 +88,23 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
             onMouseLeave={() => setHoveredCardId(null)}
             onClick={() => handleCardClick(card)}
           >
-            {/* Affichage de la bordure actuelle */}
+            {/* Bordure */}
             {currentRarity !== null && currentRarity > 0 && (
               <img
-                src={rarityImages[currentRarity]}
+                src={`/TouhouCardGame/${rarityImages[currentRarity]}`}
                 alt={`Border rarity ${currentRarity}`}
                 className="absolute inset-0 pointer-events-none object-cover"
               />
             )}
 
-            {/* Nom carte si possédée */}
+            {/* Nom carte */}
             {card.owned && (
               <h3 className="absolute top-2 left-2 text-white font-bold drop-shadow-lg">
                 {card.name}
               </h3>
             )}
 
-            {/* Tooltip rareté si hover */}
+            {/* Tooltip rareté */}
             {card.owned && hoveredCardId === card.id && (
               <QuantityTooltip
                 quantity_by_rarity={
