@@ -77,7 +77,7 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/testDB", async (req, res) => {
+deckRouter.get("/testDB", async (req, res) => {
   try {
     const [rows] = await db.query("SELECT 1+1 AS result");
     res.json({ success: true, result: rows[0].result });
