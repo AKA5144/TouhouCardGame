@@ -81,7 +81,11 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
             key={card.id}
             className="card relative"
             style={{
-              backgroundImage: `url(${card.owned ? card.image_url : placeholderImageUrl})`,
+              backgroundImage: `url(${
+                card.owned
+                  ? `${process.env.PUBLIC_URL}/${card.image_url}`
+                  : `${process.env.PUBLIC_URL}/${placeholderImageUrl}`
+              })`,
               cursor: card.owned ? "pointer" : "default",
               height: "270px",
               width: "180px",
@@ -95,7 +99,7 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
             {/* Affichage de la bordure actuelle */}
             {currentRarity !== null && currentRarity > 0 && (
               <img
-                src={rarityImages[currentRarity]}
+                src={`${process.env.PUBLIC_URL}/${rarityImages[currentRarity]}`}
                 alt={`Border rarity ${currentRarity}`}
                 className="absolute inset-0 pointer-events-none object-cover"
               />
