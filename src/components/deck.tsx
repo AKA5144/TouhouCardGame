@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "../Style/game/card.css";
 
 interface Deck {
@@ -11,11 +12,9 @@ interface Deck {
 function DeckCard({ deck }: { deck: Deck }) {
   const [hover, setHover] = useState(false);
 
-  const url = `/deck/${encodeURIComponent(deck.name)}?id=${deck.ID}`;
-
   return (
-    <a
-      href={url}
+    <Link
+      to={`/deck/${encodeURIComponent(deck.name)}?id=${deck.ID}`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -39,10 +38,9 @@ function DeckCard({ deck }: { deck: Deck }) {
       >
         <h3>{deck.name}</h3>
       </div>
-    </a>
+    </Link>
   );
 }
-
 
 export default function DeckDisplay() {
   const [deck, setDeck] = useState<Deck[]>([]);
