@@ -8,12 +8,11 @@ export type QuantityByRarity = {
 };
 
 export const rarityImages: Record<number, string> = {
-  1: "/TouhouCardGame/Assets/Border/bronze.png",
-  2: "/TouhouCardGame/Assets/Border/silver.png",
-  3: "/TouhouCardGame/Assets/Border/gold.png",
-  4: "/TouhouCardGame/Assets/Border/rainbow.png",
+  1: "Assets/Border/bronze.png",
+  2: "Assets/Border/silver.png",
+  3: "Assets/Border/gold.png",
+  4: "Assets/Border/rainbow.png",
 };
-
 
 
 export function getHighestRarity(qty: QuantityByRarity): number | null {

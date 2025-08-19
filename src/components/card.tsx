@@ -91,10 +91,11 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
             {/* Bordure */}
             {currentRarity !== null && currentRarity > 0 && (
               <img
-                src={rarityImages[currentRarity]}
+                src={`/TouhouCardGame/${rarityImages[currentRarity]}`}
                 alt={`Border rarity ${currentRarity}`}
                 className="absolute inset-0 pointer-events-none object-cover"
               />
+
             )}
 
             {/* Nom carte */}
