@@ -77,18 +77,13 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   }
 });
 
-deckRouter.get('/testdb', async (req, res) => {
+router.get("/testDB", async (req, res) => {
   try {
-    console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASS:', process.env.DB_PASS);
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('DB_PORT:', process.env.DB_PORT);
-    const [rows] = await db.query('SELECT 1+1 AS result');
-    res.send(`Résultat test : ${rows[0].result}`);
+    const [rows] = await db.query("SELECT 1+1 AS result");
+    res.json({ success: true, result: rows[0].result });
   } catch (err) {
-    console.error('Erreur testDB :', err);
-    res.status(500).send(`Erreur testDB : ${err.message}`);
+    console.error("❌ Erreur testDB :", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
