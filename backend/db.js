@@ -1,30 +1,16 @@
-
 import mysql from "mysql2/promise";
-import dotenv from "dotenv";
 
-dotenv.config();
+// Création du pool MySQL
+const db = await mysql.createPool({
+  host: process.env.DB_HOST,       // ex: caboose.proxy.rlwy.net
+  port: process.env.DB_PORT,       // ex: 46400
+  user: process.env.DB_USER,       // ex: root
+  password: process.env.DB_PASS,   // ton mot de passe Railway
+  database: process.env.DB_NAME,   // ex: railway
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
 
-async function testDB() {
-  try {
-    const pool = await mysql.createPool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_NAME,
-      port: process.env.DB_PORT,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    });
-
-    const [rows] = await pool.query("SELECT NOW() AS currentTime");
-    console.log("✅ Database connection successful!");
-    console.log("Current time from DB:", rows[0].currentTime);
-
-    await pool.end();
-  } catch (err) {
-    console.error("❌ Database connection failed:", err.message);
-  }
-}
-
-testDB();
+// ✅ Export par défaut
+export default db;
