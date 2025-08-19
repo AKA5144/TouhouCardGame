@@ -79,7 +79,12 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
 
 deckRouter.get('/testdb', async (req, res) => {
   try {
-    const [rows] = await db.query('SELECT 1 + 1 AS result');
+    console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '****' : null);
+console.log('DB_NAME:', process.env.DB_NAME);
+console.log('DB_PORT:', process.env.DB_PORT);
+    const [rows] = await db.query('SELECT 1+1 AS result');
     res.send(`Résultat test : ${rows[0].result}`);
   } catch (err) {
     console.error('Erreur testDB :', err);
