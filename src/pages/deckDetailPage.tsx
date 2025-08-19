@@ -26,9 +26,10 @@ export default function DeckDetailPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${encodeURIComponent(deckId)}`, {
-      credentials: "include",
-    })
+      fetch(`https://TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${encodeURIComponent(deckId)}`, {
+        method: "GET",
+        credentials: "include",
+      })
       .then((res) => {
         if (!res.ok) throw new Error("Erreur réseau");
         return res.json();
