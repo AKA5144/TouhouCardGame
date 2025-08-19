@@ -10,11 +10,22 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+// Liste des origines autorisées
+const allowedOrigins = [
+  "https://aka5144.github.io",
+  "http://localhost:5173"
+];
 
 app.use(cors({
-  origin: FRONTEND_URL, 
-  credentials: true,
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // autorise Postman ou fetch sans origin
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = 'CORS policy does not allow this origin';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true // nécessaire si tu utilises cookies
 }));
 
 app.use(cookieParser());
