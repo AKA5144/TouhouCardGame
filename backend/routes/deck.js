@@ -77,5 +77,13 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   }
 });
 
-
+deckRouter.get('/testdb', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT 1 + 1 AS result');
+    res.send(`Résultat test : ${rows[0].result}`);
+  } catch (err) {
+    console.error('Erreur testDB :', err);
+    res.status(500).send(`Erreur testDB : ${err.message}`);
+  }
+});
 
