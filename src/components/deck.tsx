@@ -11,9 +11,7 @@ interface Deck {
 function DeckCard({ deck }: { deck: Deck }) {
   const [hover, setHover] = useState(false);
 
-  const basePath = "/TouhouCardGame";
-  const url = `${basePath}/deck/${encodeURIComponent(deck.name)}?id=${deck.ID}`;
-
+  const url = `/deck/${encodeURIComponent(deck.name)}?id=${deck.ID}`;
 
   return (
     <a
@@ -44,6 +42,7 @@ function DeckCard({ deck }: { deck: Deck }) {
     </a>
   );
 }
+
 
 export default function DeckDisplay() {
   const [deck, setDeck] = useState<Deck[]>([]);
