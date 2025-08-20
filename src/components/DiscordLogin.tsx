@@ -1,13 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "../Style/common/discord.css";
 
-// Discord OAuth settings
 const CLIENT_ID = "1386612121181093939";
 const REDIRECT_URI = "https://touhoucardgamebackend.onrender.com/oauth/discord/callback";
 
 function getDiscordAuthUrl() {
-  const currentUrl = window.location.href; 
-  const state = encodeURIComponent(currentUrl);
+  const state = encodeURIComponent(window.location.href);
   return `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
     REDIRECT_URI
   )}&response_type=code&scope=identify&state=${state}`;
@@ -23,41 +21,30 @@ interface User {
 export default function DiscordLogin() {
   const [user, setUser] = useState<User | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [loggedOut, setLoggedOut] = useState(false); // Evite relog automatique
+  const [loggedOut, setLoggedOut] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
 
-  // Fetch current user on mount
+  // Récupère l'utilisateur uniquement si pas logout
   useEffect(() => {
-    if (loggedOut) return; // Si logout, ne pas relancer fetch
+    if (loggedOut) return;
+
     fetch("https://touhoucardgamebackend.onrender.com/oauth/me", {
       credentials: "include",
     })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error("Not logged in");
-      })
-      .then((data) => setUser(data))
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then(setUser)
       .catch(() => setUser(null));
   }, [loggedOut]);
 
-  // Close popup when clicking outside
+  // Fermer popup si clic en dehors
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-        setIsPopupOpen(false);
-      }
+    function handleClickOutside(e: MouseEvent) {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) setIsPopupOpen(false);
     }
-
-    if (isPopupOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (isPopupOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isPopupOpen]);
 
-  // Logout handler
   function handleLogout() {
     fetch("https://touhoucardgamebackend.onrender.com/oauth/logout", {
       method: "POST",
@@ -66,36 +53,27 @@ export default function DiscordLogin() {
       .then((res) => {
         if (res.ok) {
           setUser(null);
-          setLoggedOut(true); // Empêche relog automatique
+          setLoggedOut(true); // Bloque tout relog automatique
         }
       })
-      .catch((err) => console.error("Erreur lors de la déconnexion :", err));
+      .catch(console.error);
   }
 
   if (user) {
-    const isGif = user.avatar?.startsWith("a_");
-    const avatarUrl = isGif
+    const avatarUrl = user.avatar?.startsWith("a_")
       ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.gif`
       : `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
 
     return (
       <div className="fixed top-4 right-4 z-50" ref={popupRef}>
         <div className="relative inline-block">
-          <div className="cursor-pointer" onClick={() => setIsPopupOpen((prev) => !prev)}>
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-24 lg:h-24 rounded-full"
-            />
+          <div className="cursor-pointer" onClick={() => setIsPopupOpen((p) => !p)}>
+            <img className="w-12 h-12 rounded-full" src={avatarUrl} alt="avatar" />
           </div>
           {isPopupOpen && (
-            <div className="absolute top-full right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md z-50 shadow-lg p-3">
-              <p className="text-black text-[10px] sm:text-sm text-center mb-2">
-                Hello, {user.username}!
-              </p>
-              <button onClick={handleLogout} className="logout-btn">
-                Log out
-              </button>
+            <div className="absolute top-full right-0 mt-2 w-40 bg-white border rounded-md shadow p-3">
+              <p className="text-center mb-2">Hello, {user.username}!</p>
+              <button onClick={handleLogout} className="logout-btn">Log out</button>
             </div>
           )}
         </div>
@@ -104,13 +82,8 @@ export default function DiscordLogin() {
   }
 
   return (
-    <div id="discord-login-container" className="w-12 sm:w-32 md:w-40 lg:w-48">
-      <a
-        className="discord-btn text-[6px] sm:text-sm md:text-base lg:text-lg"
-        href={getDiscordAuthUrl()}
-      >
-        Login
-      </a>
+    <div id="discord-login-container">
+      <a className="discord-btn" href={getDiscordAuthUrl()}>Login</a>
     </div>
   );
 }
