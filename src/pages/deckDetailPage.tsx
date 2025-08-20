@@ -3,6 +3,7 @@ import DiscordLogin from "../components/DiscordLogin";
 import React, { useEffect, useState } from "react";
 import "../Style/common/main.css";
 import CardDisplay from "../components/card";
+import { Link } from "react-router-dom";
 
 type Card = {
   id: number;
@@ -60,9 +61,9 @@ export default function DeckDetailPage() {
       </a>
 
       <p style={{ marginTop: 8, marginBottom: 8 }}>
-        <a href="/decks" style={{ color: "#000000ff", textDecoration: "underline" }}>
+        <Link to="/decks" style={{ color: "#000", textDecoration: "underline" }}>
           ← Back to Decks
-        </a>
+        </Link>
       </p>
 
       {loading && <p>Chargement des cartes...</p>}
