@@ -12,6 +12,7 @@ function getDiscordAuthUrl() {
     REDIRECT_URI
   )}&response_type=code&scope=identify&state=${state}`;
 }
+
 interface User {
   id: string;
   username: string;
@@ -22,10 +23,12 @@ interface User {
 export default function DiscordLogin() {
   const [user, setUser] = useState<User | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [loggedOut, setLoggedOut] = useState(false); // Evite relog automatique
   const popupRef = useRef<HTMLDivElement>(null);
 
   // Fetch current user on mount
   useEffect(() => {
+    if (loggedOut) return; // Si logout, ne pas relancer fetch
     fetch("https://touhoucardgamebackend.onrender.com/oauth/me", {
       credentials: "include",
     })
@@ -35,7 +38,7 @@ export default function DiscordLogin() {
       })
       .then((data) => setUser(data))
       .catch(() => setUser(null));
-  }, []);
+  }, [loggedOut]);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -63,7 +66,7 @@ export default function DiscordLogin() {
       .then((res) => {
         if (res.ok) {
           setUser(null);
-          window.location.reload();
+          setLoggedOut(true); // Empêche relog automatique
         }
       })
       .catch((err) => console.error("Erreur lors de la déconnexion :", err));
@@ -102,7 +105,10 @@ export default function DiscordLogin() {
 
   return (
     <div id="discord-login-container" className="w-12 sm:w-32 md:w-40 lg:w-48">
-      <a className="discord-btn text-[6px] sm:text-sm md:text-base lg:text-lg" href={getDiscordAuthUrl()}>
+      <a
+        className="discord-btn text-[6px] sm:text-sm md:text-base lg:text-lg"
+        href={getDiscordAuthUrl()}
+      >
         Login
       </a>
     </div>
