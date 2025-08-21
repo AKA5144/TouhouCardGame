@@ -7,6 +7,8 @@ interface Deck {
   name: string;
   image_url: string;
   image_hover_url: string;
+  ownedCount: number;
+  totalCount: number; 
 }
 
 function DeckCard({ deck }: { deck: Deck }) {
@@ -55,6 +57,7 @@ function DeckCard({ deck }: { deck: Deck }) {
               fontSize: "14px",
             }}
           >
+            {deck.ownedCount}/{deck.totalCount}
           </div>
         )}
       </div>

@@ -4,6 +4,7 @@ import { verifyToken } from './discord.js';
 
 export const deckRouter = express.Router();
 
+// Récupérer tous les decks
 deckRouter.get("/", async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM deck");
@@ -14,6 +15,7 @@ deckRouter.get("/", async (req, res) => {
   }
 });
 
+// Récupérer toutes les cartes d'un deck avec totalCount
 deckRouter.get("/card", async (req, res) => {
   const deckId = req.query.id;
 
@@ -22,24 +24,23 @@ deckRouter.get("/card", async (req, res) => {
   }
 
   try {
+    // toutes les cartes du deck
     const [cards] = await db.query("SELECT * FROM card WHERE deck_id = ?", [deckId]);
 
+    // total de cartes distinctes dans le deck
     const [[{ totalCount }]] = await db.query(
       "SELECT COUNT(*) AS totalCount FROM card WHERE deck_id = ?",
       [deckId]
     );
 
-    res.json({
-      totalCount,
-      cards
-    });
+    res.json({ totalCount, cards });
   } catch (err) {
     console.error("Erreur récupération cartes:", err);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
 
-
+// Récupérer les cartes de l'utilisateur pour un deck, avec ownedCount et totalCount
 deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   const discordId = req.user.id;
   const deckId = req.query.deckId;
@@ -53,7 +54,7 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
       [deckId]
     );
 
-    // toutes les cartes possédées par l'utilisateur (peu importe la rareté)
+    // cartes possédées par l'utilisateur (distinctes, peu importe la rareté)
     const [userCards] = await db.query(
       `SELECT DISTINCT uc.card_id
        FROM user_cards uc
@@ -62,7 +63,7 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
       [discordId, deckId]
     );
 
-    // on fait la map détaillée (comme avant)
+    // map pour récupérer quantity_by_rarity par card_id
     const [userCardsFull] = await db.query(
       "SELECT card_id, quantity_by_rarity FROM user_cards WHERE discord_id = ?",
       [discordId]
@@ -83,14 +84,13 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
       userCardMap.set(c.card_id, quantities);
     });
 
-    // Ajoute le flag "owned" pour chaque carte du deck
+    // Ajouter flag owned et quantity_by_rarity à chaque carte
     const cardsWithOwnership = deckCards.map(card => ({
       ...card,
       owned: userCardMap.has(card.id),
       quantity_by_rarity: userCardMap.get(card.id) || {0:0,1:0,2:0,3:0,4:0}
     }));
 
-    // compte final (différentes cartes uniquement)
     const totalCount = deckCards.length;
     const ownedCount = userCards.length;
 
