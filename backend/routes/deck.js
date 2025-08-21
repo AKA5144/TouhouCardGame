@@ -15,7 +15,6 @@ deckRouter.get("/", async (req, res) => {
   }
 });
 
-// Récupérer toutes les cartes d'un deck avec totalCount
 deckRouter.get("/card", async (req, res) => {
   const deckId = req.query.id;
 
@@ -40,7 +39,6 @@ deckRouter.get("/card", async (req, res) => {
   }
 });
 
-// Récupérer les cartes de l'utilisateur pour un deck, avec ownedCount et totalCount
 deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   const discordId = req.user.id;
   const deckId = req.query.deckId;
@@ -48,13 +46,13 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   if (!deckId) return res.status(400).json({ error: "deckId is required" });
 
   try {
-    // Toutes les cartes du deck
+    // toutes les cartes du deck
     const [deckCards] = await db.query(
       "SELECT * FROM card WHERE deck_id = ?",
       [deckId]
     );
 
-    // Cartes possédées par l'utilisateur (distinctes)
+    // cartes possédées par l'utilisateur (distinctes, peu importe la rareté)
     const [userCards] = await db.query(
       `SELECT DISTINCT uc.card_id
        FROM user_cards uc
@@ -63,7 +61,7 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
       [discordId, deckId]
     );
 
-    // Récupérer quantity_by_rarity par card_id
+    // map pour récupérer quantity_by_rarity par card_id
     const [userCardsFull] = await db.query(
       "SELECT card_id, quantity_by_rarity FROM user_cards WHERE discord_id = ?",
       [discordId]
@@ -85,20 +83,19 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
     });
 
     // Ajouter flag owned et quantity_by_rarity à chaque carte
-    const cardsWithOwnership = deckCards.map(card => ({
-      ...card,
-      owned: userCardMap.has(card.id),
-      quantity_by_rarity: userCardMap.get(card.id) || {0:0,1:0,2:0,3:0,4:0}
-    }));
-
-    // Ne pas compter la carte id=0 dans le comptage
-    const cardsForCount = cardsWithOwnership.filter(c => c.id !== 0);
-    const totalCount = cardsForCount.length;
-    const ownedCount = cardsForCount.filter(c => c.owned).length;
+    const cardsWithOwnership = deckCards.map(card => {
+      const owned = userCardMap.has(card.id);
+      return {
+        ...card,
+        owned,
+        quantity_by_rarity: userCardMap.get(card.id) || {0:0,1:0,2:0,3:0,4:0},
+        image: owned ? card.image : null   // 🚀 image supprimée si pas owned
+      };
+    });
 
     res.json({
-      totalCount,
-      ownedCount,
+      totalCount: deckCards.length,
+      ownedCount: userCards.length,
       cards: cardsWithOwnership
     });
 
@@ -107,4 +104,5 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
