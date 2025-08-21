@@ -23,6 +23,7 @@ function DeckCard({ deck }: { deck: Deck }) {
         height: "300px",
         textDecoration: "none",
         color: "inherit",
+        position: "relative",
       }}
     >
       <div
@@ -34,13 +35,34 @@ function DeckCard({ deck }: { deck: Deck }) {
           width: "100%",
           height: "100%",
           transition: "transform 0.2s ease",
+          borderRadius: "12px",
+          position: "relative",
         }}
       >
         <h3>{deck.name}</h3>
+
+        {/* Affichage owned/total au hover */}
+        {hover && (
+          <div
+            style={{
+              position: "absolute",
+              top: "8px",
+              left: "8px",
+              backgroundColor: "rgba(0,0,0,0.6)",
+              color: "white",
+              padding: "4px 8px",
+              borderRadius: "6px",
+              fontSize: "14px",
+            }}
+          >
+          </div>
+        )}
       </div>
     </Link>
   );
 }
+
+
 
 export default function DeckDisplay() {
   const [deck, setDeck] = useState<Deck[]>([]);

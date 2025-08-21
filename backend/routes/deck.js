@@ -22,14 +22,23 @@ deckRouter.get("/card", async (req, res) => {
   }
 
   try {
-    const query = "SELECT * FROM card WHERE deck_id = ?";
-    const [cards] = await db.query(query, [deckId]);
-    res.json(cards);
+    const [cards] = await db.query("SELECT * FROM card WHERE deck_id = ?", [deckId]);
+
+    const [[{ totalCount }]] = await db.query(
+      "SELECT COUNT(*) AS totalCount FROM card WHERE deck_id = ?",
+      [deckId]
+    );
+
+    res.json({
+      totalCount,
+      cards
+    });
   } catch (err) {
     console.error("Erreur récupération cartes:", err);
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   const discordId = req.user.id;
@@ -38,18 +47,29 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
   if (!deckId) return res.status(400).json({ error: "deckId is required" });
 
   try {
+    // toutes les cartes du deck
     const [deckCards] = await db.query(
-      "SELECT * FROM card WHERE deck_id = ? OR id = 0",
+      "SELECT * FROM card WHERE deck_id = ?",
       [deckId]
     );
 
+    // toutes les cartes possédées par l'utilisateur (peu importe la rareté)
     const [userCards] = await db.query(
+      `SELECT DISTINCT uc.card_id
+       FROM user_cards uc
+       JOIN card c ON c.id = uc.card_id
+       WHERE uc.discord_id = ? AND c.deck_id = ?`,
+      [discordId, deckId]
+    );
+
+    // on fait la map détaillée (comme avant)
+    const [userCardsFull] = await db.query(
       "SELECT card_id, quantity_by_rarity FROM user_cards WHERE discord_id = ?",
       [discordId]
     );
 
     const userCardMap = new Map();
-    userCards.forEach(c => {
+    userCardsFull.forEach(c => {
       let quantities = {0:0,1:0,2:0,3:0,4:0};
       try {
         if (c.quantity_by_rarity) {
@@ -63,27 +83,25 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
       userCardMap.set(c.card_id, quantities);
     });
 
+    // Ajoute le flag "owned" pour chaque carte du deck
     const cardsWithOwnership = deckCards.map(card => ({
       ...card,
       owned: userCardMap.has(card.id),
       quantity_by_rarity: userCardMap.get(card.id) || {0:0,1:0,2:0,3:0,4:0}
     }));
 
-    res.json(cardsWithOwnership);
+    // compte final (différentes cartes uniquement)
+    const totalCount = deckCards.length;
+    const ownedCount = userCards.length;
+
+    res.json({
+      totalCount,
+      ownedCount,
+      cards: cardsWithOwnership
+    });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-deckRouter.get("/testDB", async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT 1+1 AS result");
-    res.json({ success: true, result: rows[0].result });
-  } catch (err) {
-    console.error("❌ Erreur testDB :", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
