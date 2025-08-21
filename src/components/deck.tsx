@@ -65,23 +65,43 @@ function DeckCard({ deck }: { deck: Deck }) {
   );
 }
 
-
-
 export default function DeckDisplay() {
-  const [deck, setDeck] = useState<Deck[]>([]);
+  const [decks, setDecks] = useState<Deck[]>([]);
 
   useEffect(() => {
     fetch("https://TouhouCardGameBackend.onrender.com/deck")
       .then((res) => res.json())
-      .then((data) => setDeck(data))
+      .then(async (data: Deck[]) => {
+        const decksWithCounts = await Promise.all(
+          data.map(async (deck) => {
+            try {
+              const res = await fetch(
+                `https://TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${deck.ID}`,
+                { credentials: "include" }
+              );
+              const userData = await res.json();
+              return {
+                ...deck,
+                ownedCount: userData.ownedCount,
+                totalCount: userData.totalCount,
+              };
+            } catch (err) {
+              console.error(err);
+              return { ...deck, ownedCount: 0, totalCount: 0 };
+            }
+          })
+        );
+        setDecks(decksWithCounts);
+      })
       .catch((err) => console.error(err));
   }, []);
 
   return (
     <div className="card_collection_box">
-      {deck.map((d) => (
+      {decks.map((d) => (
         <DeckCard key={d.ID} deck={d} />
       ))}
     </div>
   );
 }
+
