@@ -89,14 +89,24 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
         ...card,
         owned,
         quantity_by_rarity: userCardMap.get(card.id) || {0:0,1:0,2:0,3:0,4:0},
-        image: owned ? card.image : null   // 🚀 image supprimée si pas owned
+        image: owned ? card.image : null
       };
     });
 
+    // 🚀 Ajout d'une "carte Unknown" (toujours présente, id=0)
+    const unknownCard = {
+      id: 0,
+      name: "Unknown",
+      image: "/Assets/Decks/Default/default.webp",
+      deck_id: Number(deckId),
+      owned: false,
+      quantity_by_rarity: {0:0,1:0,2:0,3:0,4:0}
+    };
+
     res.json({
-      totalCount: deckCards.length,
+      totalCount: deckCards.length,   // on NE compte PAS la carte id=0
       ownedCount: userCards.length,
-      cards: cardsWithOwnership
+      cards: [unknownCard, ...cardsWithOwnership] // on met Unknown en premier
     });
 
   } catch (err) {
@@ -104,5 +114,6 @@ deckRouter.get("/user-cards", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 
