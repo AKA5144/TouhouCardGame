@@ -35,8 +35,8 @@ export default function DeckDetailPage() {
         if (!res.ok) throw new Error("Erreur réseau");
         return res.json();
       })
-      .then((data: Card[]) => {
-        setCards(data);
+      .then((data) => {
+        setCards(data.cards || []);
       })
       .catch((err) => {
         setError(err.message || "Erreur inconnue");
