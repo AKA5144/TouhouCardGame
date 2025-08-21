@@ -1,9 +1,8 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import DiscordLogin from "../components/DiscordLogin";
 import React, { useEffect, useState } from "react";
 import "../Style/common/main.css";
 import CardDisplay from "../components/card";
-import { Link } from "react-router-dom";
 
 type Card = {
   id: number;
@@ -18,61 +17,63 @@ export default function DeckDetailPage() {
   const deckId = searchParams.get("id");
 
   const [cards, setCards] = useState<Card[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!deckId) return;
 
-    setLoading(true);
-    setError(null);
+    const fetchCards = async () => {
+      setLoading(true);
+      setError(null);
 
-      fetch(`https://TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${encodeURIComponent(deckId)}`, {
-        method: "GET",
-        credentials: "include",
-      })
-      .then((res) => {
+      try {
+        const res = await fetch(
+          `https://TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${encodeURIComponent(deckId)}`,
+          { method: "GET", credentials: "include" }
+        );
+
         if (!res.ok) throw new Error("Erreur réseau");
-        return res.json();
-      })
-      .then((data) => {
+
+        const data = await res.json();
         setCards(data.cards || []);
-      })
-      .catch((err) => {
-        setError(err.message || "Erreur inconnue");
-      })
-      .finally(() => {
+      } catch (err: any) {
+        setError(err.message ?? "Erreur inconnue");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchCards();
   }, [deckId]);
 
-  const placeholderCard = cards.find(c => c.id === 0);
-
-  const cardsWithoutPlaceholder = cards.filter(card => card.id !== 0);
+  // Extraire placeholder (id=0) et filtrer le reste
+  const placeholderCard = cards.find((c) => c.id === 0);
+  const cardsWithoutPlaceholder = cards.filter((c) => c.id !== 0);
 
   return (
     <div className="overlay_box">
       <DiscordLogin />
 
-      <a className="title_link">
-        <p className="title_text text-4xl sm:text-5xl md:text-6xl lg:text-7xl" style={{ marginBottom: 4 }}>
-          {deckName}
-        </p>
-      </a>
+      <h1 className="title_text text-4xl sm:text-5xl md:text-6xl lg:text-7xl mb-2">
+        {deckName}
+      </h1>
 
-      <p style={{ marginTop: 8, marginBottom: 8 }}>
-        <Link to="/decks" style={{ color: "#000", textDecoration: "underline" }}>
+      <p className="mb-4">
+        <Link to="/decks" className="underline text-black">
           ← Back to Decks
         </Link>
       </p>
 
       {loading && <p>Chargement des cartes...</p>}
-      {error && <p style={{ color: "red" }}>Erreur: {error}</p>}
+      {error && <p className="text-red-600">Erreur: {error}</p>}
 
-      <CardDisplay
-        cards={cardsWithoutPlaceholder}
-        placeholder={placeholderCard}
-      />
+      {!loading && !error && (
+        <CardDisplay
+          cards={cardsWithoutPlaceholder}
+          placeholder={placeholderCard}
+        />
+      )}
     </div>
   );
 }
