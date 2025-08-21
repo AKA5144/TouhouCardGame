@@ -7,6 +7,7 @@ interface Card {
   id: number;
   name: string;
   image_url?: string;
+  image?: string; 
   owned?: boolean;
   quantity_by_rarity?: QuantityByRarity;
 }
@@ -17,7 +18,7 @@ interface CardListProps {
 }
 
 export default function CardDisplay({ cards, placeholder }: CardListProps) {
-  const placeholderImageUrl = placeholder?.image_url || "";
+  const placeholderImageUrl = placeholder?.image || placeholder?.image_url;
   const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
   const [borderIndexes, setBorderIndexes] = useState<Record<number, number>>({});
 

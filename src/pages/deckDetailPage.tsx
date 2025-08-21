@@ -17,28 +17,31 @@ export default function DeckDetailPage() {
   const deckId = searchParams.get("id");
 
   const [cards, setCards] = useState<Card[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!deckId) return;
+    if (!deckId) {
+      setError("Aucun deck sélectionné.");
+      setLoading(false);
+      return;
+    }
 
     const fetchCards = async () => {
-      setLoading(true);
-      setError(null);
-
       try {
         const res = await fetch(
           `https://TouhouCardGameBackend.onrender.com/deck/user-cards?deckId=${encodeURIComponent(deckId)}`,
           { method: "GET", credentials: "include" }
         );
 
-        if (!res.ok) throw new Error("Erreur réseau");
+        if (!res.ok) {
+          throw new Error(`Erreur serveur (${res.status})`);
+        }
 
-        const data = await res.json();
-        setCards(data.cards || []);
-      } catch (err: any) {
-        setError(err.message ?? "Erreur inconnue");
+        const data: { cards?: Card[] } = await res.json();
+        setCards(data.cards ?? []);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Erreur inconnue");
       } finally {
         setLoading(false);
       }
@@ -47,8 +50,9 @@ export default function DeckDetailPage() {
     fetchCards();
   }, [deckId]);
 
-  // Extraire placeholder (id=0) et filtrer le reste
+  // Gestion du placeholder (id=0)
   const placeholderCard = cards.find((c) => c.id === 0);
+  console.log("Placeholder card:", placeholderCard);
   const cardsWithoutPlaceholder = cards.filter((c) => c.id !== 0);
 
   return (
@@ -66,7 +70,7 @@ export default function DeckDetailPage() {
       </p>
 
       {loading && <p>Chargement des cartes...</p>}
-      {error && <p className="text-red-600">Erreur: {error}</p>}
+      {error && !loading && <p className="text-red-600">Erreur: {error}</p>}
 
       {!loading && !error && (
         <CardDisplay
