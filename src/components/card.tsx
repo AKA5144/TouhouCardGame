@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import QuantityTooltip from "./CardQuantity";
 import { getHighestRarity, rarityImages } from "./CardRarity";
+import type { QuantityByRarity } from "./CardRarity";
 
-export interface Card {
+interface Card {
   id: number;
   name: string;
   image_url?: string;
   owned?: boolean;
-  quantity_by_rarity?: Record<number, number>;
+  quantity_by_rarity?: QuantityByRarity;
 }
 
 interface CardListProps {
@@ -20,38 +21,30 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
   const [hoveredCardId, setHoveredCardId] = useState<number | null>(null);
   const [borderIndexes, setBorderIndexes] = useState<Record<number, number>>({});
 
-  // Initialise la rareté actuelle sur chaque carte
   useEffect(() => {
     const initialIndexes: Record<number, number> = {};
-    if (!Array.isArray(cards)) return;
-
     cards.forEach((card) => {
       if (card.owned && card.quantity_by_rarity) {
         const ownedRarities = Object.entries(card.quantity_by_rarity)
-          .filter(([_, qty]) => Number(qty) > 0)
+          .filter(([_, qty]) => qty > 0)
           .map(([rarity]) => parseInt(rarity))
           .sort((a, b) => a - b);
-
         if (ownedRarities.length > 0) {
           const highest = Math.max(...ownedRarities);
           initialIndexes[card.id] = ownedRarities.indexOf(highest);
         }
       }
     });
-
     setBorderIndexes(initialIndexes);
   }, [cards]);
 
   const handleCardClick = (card: Card) => {
     if (!card.owned || !card.quantity_by_rarity) return;
-
     const ownedRarities = Object.entries(card.quantity_by_rarity)
-      .filter(([_, qty]) => Number(qty) > 0)
+      .filter(([_, qty]) => qty > 0)
       .map(([rarity]) => parseInt(rarity))
       .sort((a, b) => a - b);
-
     if (ownedRarities.length === 0) return;
-
     setBorderIndexes((prev) => {
       const currentIndex = prev[card.id] ?? 0;
       const nextIndex = (currentIndex + 1) % ownedRarities.length;
@@ -59,25 +52,22 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
     });
   };
 
-  if (!Array.isArray(cards)) return <div>No cards available</div>;
-
   return (
     <div className="card_collection_box flex flex-wrap gap-4">
       {cards.map((card) => {
         const highestRarity = card.quantity_by_rarity
           ? getHighestRarity(card.quantity_by_rarity)
           : null;
-
         const ownedRarities = card.quantity_by_rarity
           ? Object.entries(card.quantity_by_rarity)
-              .filter(([_, qty]) => Number(qty) > 0)
+              .filter(([_, qty]) => qty > 0)
               .map(([rarity]) => parseInt(rarity))
               .sort((a, b) => a - b)
           : [];
-
         const currentRarity =
           ownedRarities[borderIndexes[card.id] ?? 0] ?? highestRarity;
 
+        // Chemins corrigés pour GitHub Pages
         const cardImageUrl = card.owned
           ? `/TouhouCardGame/${card.image_url}`
           : `/TouhouCardGame/${placeholderImageUrl}`;
@@ -105,6 +95,7 @@ export default function CardDisplay({ cards, placeholder }: CardListProps) {
                 alt={`Border rarity ${currentRarity}`}
                 className="absolute inset-0 pointer-events-none object-cover"
               />
+
             )}
 
             {/* Nom carte */}

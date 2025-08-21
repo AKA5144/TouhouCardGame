@@ -80,6 +80,7 @@ export default function DeckDisplay() {
                 { credentials: "include" }
               );
               const userData = await res.json();
+              console.log(deck.ID, userData);
               return {
                 ...deck,
                 ownedCount: userData.ownedCount,
