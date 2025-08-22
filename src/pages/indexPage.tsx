@@ -3,26 +3,23 @@ import DiscordLogin from "../components/DiscordLogin";
 
 
 import "../Style/common/main.css";
+import "../Style/common/indexButton.css";
 
 export default function DeckPage() {
   return (
     <div className="overlay_box">
-     <DiscordLogin />
-      <a href="https://aka5144.github.io/TouhouCardGame" className="title_link">
+      <DiscordLogin />
+      <a href="https://aka5144.github.io/TouhouCardGame">
         <p className="title_text text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
           TOUHOU CARD GAME
-          </p>
+        </p>
       </a>
       <Link
         to="/decks"
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+        className="buttonIndex w-2/3 sm:w-1/2 md:w-1/3 lg:w-1/4 aspect-[3/4] max-h-[400px]text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
       >
         Display Decks
       </Link>
     </div>
-    
   );
 }
-
-
-

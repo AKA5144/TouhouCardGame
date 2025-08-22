@@ -5,7 +5,7 @@ import "../Style/common/main.css";
 
 export default function DeckPage() {
   return (
-    <div className="overlay_box">
+    <div className="overlay_box flex flex-col items-center justify-start min-h-screen">
      <DiscordLogin />    
       <a href="https://aka5144.github.io/TouhouCardGame" className="title_link">
         <p className="title_text text-4xl sm:text-5xl md:text-6xl lg:text-7xl">

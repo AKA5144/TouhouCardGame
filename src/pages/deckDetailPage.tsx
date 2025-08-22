@@ -52,7 +52,6 @@ export default function DeckDetailPage() {
 
   // Gestion du placeholder (id=0)
   const placeholderCard = cards.find((c) => c.id === 0);
-  console.log("Placeholder card:", placeholderCard);
   const cardsWithoutPlaceholder = cards.filter((c) => c.id !== 0);
 
   return (

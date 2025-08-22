@@ -35,13 +35,13 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 
   margin: 0 auto;
 }
 
 .title_text {
-  margin-top: 20px;          /* ajoute un top spacing si besoin */
+  margin-top: 100px;
   text-shadow: 0.25vw 0.4vw 1vw black;
   z-index: 11;
   text-align: center;
